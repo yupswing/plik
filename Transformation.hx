@@ -5,7 +5,7 @@ import openfl.geom.Matrix;
 import openfl.geom.Point;
 import openfl.display.DisplayObject;
 
-class Transform
+class Transformation
 {
 
 	//TODO: NEED TO BE REFACTORED AND DOCUMENTED
