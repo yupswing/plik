@@ -139,7 +139,7 @@ class Transformation
         }*/
 
         var transformedPoint:Point = m.transformPoint(offsetPoint);
-        var offset = new Point(transformedPoint.x-absolutePoint.x,transformedPoint.y-absolutePoint.y);
+        var offset:Point = new Point(transformedPoint.x-absolutePoint.x,transformedPoint.y-absolutePoint.y);
 	    m.tx-=offset.x;
 	    m.ty-=offset.y;
 	    target.transform.matrix = m;
@@ -156,8 +156,9 @@ class Transformation
 	public function moveTo(tx:Float=0, ?ty:Float=0):Void
 	{
 	    var m:Matrix = target.transform.matrix.clone();
-	    m.tx = tx-offsetPoint.x;
-	    m.ty = ty-offsetPoint.y;
+	    var transformedOffset:Point = deltaTransformPoint(offsetPoint);
+	    m.tx = tx-transformedOffset.x;
+	    m.ty = ty-transformedOffset.y;
 	    target.transform.matrix = m;
 	}
 
