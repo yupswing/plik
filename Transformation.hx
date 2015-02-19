@@ -13,7 +13,7 @@ class Transformation
 
 	//TODO: NEED TO BE REFACTORED AND DOCUMENTED
 
-	// Radiants to Degrees and viceversa
+	// Radians to Degrees and viceversa
     public static var DEG2RAD:Float = Math.PI/180;
     public static var RAD2DEG:Float = 180/Math.PI;
 
@@ -147,7 +147,7 @@ class Transformation
     }
 
     public function deltaTransformPoint(point:Point):Point {
-    	// Ignore the traslation
+    	// Ignore the translation
         return target.transform.matrix.deltaTransformPoint(point);
     }
 
@@ -157,7 +157,7 @@ class Transformation
 	// #########################################################################
 
 
-	// Rotate in Radiants
+	// Rotate in Radians
 	public function rotateRad(angle:Float=0):Void 
 	{
 		//get the pivot absolute position
@@ -210,7 +210,7 @@ class Transformation
 	// #########################################################################
 
 
-	// Skew in Radiants
+	// Skew in Radians
 	public function skewRad(skewXRad:Float=null, ?skewYRad:Float=null):Void
 	{
 		//TODO need to be changed
