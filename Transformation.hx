@@ -126,6 +126,11 @@ class Transformation
         return target.transform.matrix.clone();
     }
 
+    public function setTo(a:Float,b:Float,c:Float,d:Float,tx:Float,ty:Float) {
+    	var m:Matrix = new Matrix(a,b,c,d,tx,ty);
+    	setMatrix(m,true);
+    }
+
 
 	// #########################################################################
 
@@ -295,7 +300,7 @@ class Transformation
 		var skewXDeg:Float = skewDeg;
 		// if not specified it will set the x and y skew using the same value
 		if (skewYDeg==null) skewYDeg = skewDeg;
-		skew(skewXDeg*DEG2RAD,skewYDeg*DEG2RAD);
+		skewRad(skewXDeg*DEG2RAD,skewYDeg*DEG2RAD);
 	}
 	public function skewX(skewXDeg:Float=null):Void { skew(skewXDeg,0.0); }
 	public function skewY(skewYDeg:Float=null):Void { skew(0.0,skewYDeg); }
@@ -473,9 +478,58 @@ class Transformation
 	// Rotate in Degrees
 	public function rotate(angle:Float=0):Void { rotateRad(angle*DEG2RAD); }
 
+	// Rotate in Radians
+	public function setRotationRad(angle:Float=0):Void 
+	{
+		//get the current angle
+		var currentRotation:Float = getRotationRad();
+		
+		//find the complementary angle to reset the rotation to 0
+		var resetAngle:Float = -currentRotation;
+			
+		//reset the rotation
+		rotateRad(resetAngle);
+		trace('reset',resetAngle*RAD2DEG);
+		
+		//set the new rotation value
+		rotateRad(angle);
+		trace('reset',angle*RAD2DEG);
+	}
+	// Set rotation in Degrees
+	public function setRotation(angle:Float=0):Void { setRotationRad(angle*DEG2RAD); }
+
+	// Rotate in Radians
+	public function getRotationRad(angle:Float=0):Float 
+	{
+
+		//thanks to http://stackoverflow.com/users/1035293/bugshake
+
+		var translate:Point;
+		var scale:Float;
+
+		var m:Matrix = getMatrix();
+
+		// extract translation
+		var p:Point = new Point();
+		translate = m.transformPoint(p);
+		m.translate( -translate.x, -translate.y);
+
+		// extract (uniform) scale
+		p.x = 1.0;
+		p.y = 0.0;
+		p = m.transformPoint(p);
+		scale = p.length;
+
+		// and rotation
+		return Math.atan2(p.y, p.x);
+	}
+	// Set rotation in Degrees
+	public function getRotation(angle:Float=0):Float { return getRotationRad() * RAD2DEG; }
+
 
 	// #########################################################################
 	// #########################################################################
+
 
 
 }
