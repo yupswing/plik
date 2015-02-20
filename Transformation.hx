@@ -17,6 +17,14 @@ class Transformation
     public static var DEG2RAD:Float = Math.PI/180;
     public static var RAD2DEG:Float = 180/Math.PI;
 
+    // Pivot Point Anchors (used by setInternalPoint and getPivotPositionPoint)
+    public inline static var TOP:Int = 0;
+    public inline static var MIDDLE:Int = 1;
+    public inline static var BOTTOM:Int = 2;
+    public inline static var LEFT:Int = 0;
+    public inline static var CENTER:Int = 1;
+    public inline static var RIGHT:Int = 2;
+
     // the pivot offset
 	private var offsetPoint:Point;
 
@@ -42,7 +50,7 @@ class Transformation
 
 		if (pivotX==null) {
 			//set the pivot point TOPLEFT of the target
-			setInternalPoint([0,0]);
+			setInternalPoint(0,0);
 		} else {
 			//set the pivot point to the specified coords
 			setAbsolutePoint(pivotX,pivotY);
@@ -54,8 +62,8 @@ class Transformation
     // SETTERs
 	// #########################################################################
 
-	public function setInternalPoint(pivotPosition:Array<Int>) {
-		offsetPoint = getPivotPositionPoint(pivotPosition,false);
+	public function setInternalPoint(pivotPositionX:Int,pivotPositionY:Int) {
+		offsetPoint = getPivotPositionPoint(pivotPositionX,pivotPositionY,false);
 	}
 
 	public function setAbsolutePoint(x:Int,y:Int) {
@@ -85,18 +93,17 @@ class Transformation
 	    return new Point(target.transform.matrix.tx,target.transform.matrix.ty);
 	}
 
-	public function getPivotPositionPoint(?pivotPosition:Array<Int>,?absolute:Bool=true):Point 
+	public function getPivotPositionPoint(?pivotPositionX:Int=0,?pivotPositionY:Int=0,?absolute:Bool=true):Point 
 	{
 		// PIVOT POINTS (pivotPosition argument)
-		// 0,0 - 1,0 - 2,0
-		//  |     |     |
+		// 0,0 - 1,0 - 2,0    x=> LEFT=0 CENTER=1 RIGHT=2
+		//  |     |     |     y=> TOP=0 MIDDLE=1 BOTTOM=2
 		// 0,1 - 1,1 - 2,1
 		//  |     |     |
 		// 0,2 - 1,2 - 2,2
 
-		if (pivotPosition==null || pivotPosition.length<2) pivotPosition = [0,0];
-		var x = ow/2*pivotPosition[0];
-		var y = oh/2*pivotPosition[1];
+		var x = ow/2*pivotPositionX;
+		var y = oh/2*pivotPositionY;
 		if (absolute) {
 			var pos = getPosition();
 			x+=pos.x;
@@ -153,56 +160,41 @@ class Transformation
 
 
 
-    // ROTATE TRANSFORMATION
+    // IDENTITY
+	// #########################################################################
+
+    public function identity(){
+		 // reset the matrix
+         var m = new Matrix();
+         m.tx = ox - offsetPoint.x;
+         m.ty = oy - offsetPoint.y;
+         target.transform.matrix = m;
+    }
+
+
+
+    // TRANSLATE TRANSFORMATION
 	// #########################################################################
 
 
-	// Rotate in Radians
-	public function rotateRad(angle:Float=0):Void 
+	// delta translation (x,y)
+	public function translate(dx:Float=0, ?dy:Float=0):Void
 	{
-		//get the pivot absolute position
-        var absolutePoint:Point = getAbsolutePoint();
-
-        //get the target matrix to apply the transformation
 	    var m:Matrix = getMatrix();
+	    m.tx += dx;
+	    m.ty += dy;
+	    target.transform.matrix = m;
+	}   
 
-	    //move the target(matrix)
-	    //the pivot point will match the origin (0,0)
-		m.tx-=absolutePoint.x;
-		m.ty-=absolutePoint.y;
-
-		//rotate the target(matrix)
-		// SAME AS m.rotate(angle);
-		var sin = Math.sin(angle);
-		var cos = Math.cos(angle);
-		var a = m.a;
-		var b = m.b;
-		var c = m.c;
-		var d = m.d;
-		var tx = m.tx;
-		var ty = m.ty;
-		m.a = a*cos - b*sin;
-		m.b = a*sin + b*cos;
-		m.c = c*cos - d*sin;
-		m.d = c*sin + d*cos;
-		m.tx = tx*cos - ty*sin;
-		m.ty = tx*sin + ty*cos;
-
-		// restore the target(matrix) position
-		m.tx+=absolutePoint.x;
-		m.ty+=absolutePoint.y;
-
-		//apply the matrix to the target
-		target.transform.matrix = m;
+	// absolute translation (x,y)
+	public function moveTo(tx:Float=0, ?ty:Float=0):Void
+	{
+	    var m:Matrix = getMatrix();
+	    var transformedOffset:Point = deltaTransformPoint(offsetPoint);
+	    m.tx = tx-transformedOffset.x;
+	    m.ty = ty-transformedOffset.y;
+	    target.transform.matrix = m;
 	}
-
-	// Rotate in Degrees
-	public function rotate(angle:Float=0):Void { rotateRad(angle*DEG2RAD); }
-
-
-	// TODO these functions need to be tested
-    public function getRotation():Float { return getRotationRadians()*DEG2RAD; }
-   	public function getRotationRadians():Float { return getSkewYRadians(); }
 
 
 
@@ -211,16 +203,20 @@ class Transformation
 
 
 	// Skew in Radians
-	public function skewRad(skewXRad:Float=null, ?skewYRad:Float=null):Void
+	//TODO skew need to be rewritten to be reliable
+	public function setSkewRad(skewRad:Float=null, ?skewYRad:Float=null):Void
 	{
-		//TODO need to be changed
-		//doesn't work as expected
+
+		var skewXRad:Float = skewRad;
+		// if not specified it will set the x and y skew using the same value
+		if (skewYRad==null) skewYRad = skewRad;
 
 		//get the pivot absolute position
 	    // (keep this BEFORE applying the new matrix to the target)
         var absolutePoint:Point = getAbsolutePoint();
 
         //get the target matrix to apply the transformation
+	    //var m:Matrix = new Matrix();
 	    var m:Matrix = getMatrix();
 
 		// apply the skew (matrix.c is HORIZONTAL, matrix.b is VERTICAL)
@@ -232,6 +228,7 @@ class Transformation
 	    }
 
 		//apply the matrix to the target
+		//m.concat(getMatrix());
 	    target.transform.matrix = m;
 
 	    //adjust the target position to match the pivot
@@ -240,34 +237,59 @@ class Transformation
 	}
 
 	// Skew in Degrees
-	public function skew(skewXDeg:Float=null, ?skewYDeg:Float=null):Void
+	public function setSkew(skewXDeg:Float=null, ?skewYDeg:Float=null):Void
 	{
 		// check null to avoid error on multiplication
-	    if (skewXDeg==null) skewXDeg = 0.0;
-	    if (skewYDeg==null) skewYDeg = 0.0;
-		skewRad(skewXDeg*DEG2RAD,skewYDeg*DEG2RAD);
+		var skewXRad:Float=null;
+		var skewYRad:Float=null;
+		if (skewXDeg!=null) skewXRad = skewXDeg*DEG2RAD;
+		if (skewYDeg!=null) skewYRad = skewYDeg*DEG2RAD;
+		setSkewRad(skewXRad,skewYRad);
 	}
 
 	// one parameter shortcuts
-	public function skewX(skewDeg:Float=null):Void { skew(skewDeg,null); }
-	public function skewY(skewDeg:Float=null):Void { skew(null,skewDeg); }
-	public function skewXRad(skewRad:Float=null):Void { skew(skewRad,null); }
-	public function skewYRad(skewRad:Float=null):Void { skew(null,skewRad); }
+	public function setSkewX(skewXDeg:Float=null):Void { setSkew(skewXDeg,null); }
+	public function setSkewY(skewYDeg:Float=null):Void { setSkew(null,skewYDeg); }
+	public function setSkewXRad(skewXRad:Float=null):Void { setSkewRad(skewXRad,null); }
+	public function setSkewYRad(skewYRad:Float=null):Void { setSkewRad(null,skewYRad); }
 
-
-	// TODO these functions need to be tested
-    public function getSkewXRadians():Float
-    {
-        var m:Matrix = getMatrix();
-        return Math.atan2(-m.c, m.d);
-    }
-	public function getSkewYRadians():Float
+	// Sum Skew in Radians
+	public function skewRad(skewRad:Float=0.0, ?skewYRad:Float=null):Void
 	{
-        var m:Matrix = getMatrix();
-		return Math.atan2(m.b, m.a);
+		var skewXRad:Float = getSkewXRad()+skewRad;
+		// if not specified it will set the x and y skew using the same value
+		if (skewYRad==null) skewYRad = getSkewYRad()+skewRad;
+
+		setSkewRad(skewXRad,skewYRad);
+
+	}
+	// one parameter shortcuts
+	public function skew(skewDeg:Float=0.0,?skewYDeg:Float=null):Void {
+		var skewXDeg:Float = skewDeg;
+		// if not specified it will set the x and y skew using the same value
+		if (skewYDeg==null) skewYDeg = skewDeg;
+		skew(skewXDeg*DEG2RAD,skewYDeg*DEG2RAD);
+	}
+	public function skewX(skewXDeg:Float=null):Void { skew(skewXDeg,0.0); }
+	public function skewY(skewYDeg:Float=null):Void { skew(0.0,skewYDeg); }
+	public function skewXRad(skewXRad:Float=null):Void { skewRad(skewXRad,0.0); }
+	public function skewYRad(skewYRad:Float=null):Void { skewRad(0.0,skewYRad); }
+
+
+    public function getSkewXRad():Float
+    {
+    	var px = new Point(0, 1);
+		px = deltaTransformPoint(px);
+		return Math.atan2(px.y, px.x) - Math.PI/2;
+    }
+	public function getSkewYRad():Float
+	{
+		var py = new Point(1, 0);
+		py = deltaTransformPoint(py);
+		return Math.atan2(py.y, py.x);
 	} 
-    public function getSkewX():Float { return getSkewXRadians()*RAD2DEG; }
-	public function getSkewY():Float { return getSkewYRadians()*RAD2DEG; }
+    public function getSkewX():Float { return getSkewXRad()*RAD2DEG; }
+	public function getSkewY():Float { return getSkewYRad()*RAD2DEG; }
 
 
 
@@ -343,7 +365,7 @@ class Transformation
 		}
 		else
 		{
-			var skewYRad:Float = getSkewYRadians();
+			var skewYRad:Float = getSkewYRad();
 			m.a = Math.cos(skewYRad) * scaleX;
 			m.b = Math.sin(skewYRad) * scaleX;
 		}
@@ -363,7 +385,7 @@ class Transformation
 		}
 		else
 		{
-			var skewXRad:Float = getSkewXRadians();
+			var skewXRad:Float = getSkewXRad();
 			m.c = -Math.sin(skewXRad) * scaleY;
 			m.d =  Math.cos(skewXRad) * scaleY;
 		}
@@ -385,95 +407,78 @@ class Transformation
 
 
 
-    // TRANSLATE TRANSFORMATION
+    // FLIP
+	// #########################################################################
+
+	public function flipX():Void { scaleX(-1); }
+	public function flipY():Void { scaleY(-1); }
+
+
+    // ROTATE TRANSFORMATION
 	// #########################################################################
 
 
-	// delta translation (x,y)
-	public function translate(dx:Float=0, ?dy:Float=0):Void
+	// Rotate in Radians
+	public function rotateRad(angle:Float=0):Void 
 	{
+		//get the pivot absolute position
+        var absolutePoint:Point = getAbsolutePoint();
+
+        //get the target matrix to apply the transformation
 	    var m:Matrix = getMatrix();
-	    m.tx += dx;
-	    m.ty += dy;
-	    target.transform.matrix = m;
-	}   
 
-	// absolute translation (x,y)
-	public function moveTo(tx:Float=0, ?ty:Float=0):Void
-	{
-	    var m:Matrix = getMatrix();
-	    var transformedOffset:Point = deltaTransformPoint(offsetPoint);
-	    m.tx = tx-transformedOffset.x;
-	    m.ty = ty-transformedOffset.y;
-	    target.transform.matrix = m;
+	    //move the target(matrix)
+	    //the pivot point will match the origin (0,0)
+		m.tx-=absolutePoint.x;
+		m.ty-=absolutePoint.y;
+
+		//rotate the target(matrix)
+		// SAME AS m.rotate(angle);
+		var sin = Math.sin(angle);
+		var cos = Math.cos(angle);
+		var a = m.a;
+		var b = m.b;
+		var c = m.c;
+		var d = m.d;
+		var tx = m.tx;
+		var ty = m.ty;
+		m.a = a*cos - b*sin;
+		m.b = a*sin + b*cos;
+		m.c = c*cos - d*sin;
+		m.d = c*sin + d*cos;
+		m.tx = tx*cos - ty*sin;
+		m.ty = tx*sin + ty*cos;
+
+		// restore the target(matrix) position
+		m.tx+=absolutePoint.x;
+		m.ty+=absolutePoint.y;
+
+		//apply the matrix to the target
+		target.transform.matrix = m;
 	}
 
+	// Rotate in Degrees
+	public function rotate(angle:Float=0):Void { rotateRad(angle*DEG2RAD); }
 
-    // IDENTITY
-	// #########################################################################
-
-	//TODO (looks like bug on offsetpoint)
-    public function identity(){
-		 // reset the matrix
-         var m = new Matrix();
-         m.tx = ox - offsetPoint.x;
-         m.ty = oy - offsetPoint.x;
-         target.transform.matrix = m;
-    }
-
-
-	// #########################################################################
-	// #########################################################################
-
-
-    //TODO: BELOW FUNCTIONS NEED TO BE TESTED TO BE INCLUDED
-
-
-/*	public static function setSkewXRadians(m:Matrix, skewX:Float):Void
+	// TODO these functions need to be tested
+/*   	public function setRotationRad(rotation:Float):Void
 	{
-		var scaleY:Float = getScaleY(m);
-		m.c = -scaleY * Math.sin(skewX);
-		m.d =  scaleY * Math.cos(skewX);
+		var oldRotation:Float = getRotationRad();
+		var oldSkewX:Float = getSkewXRad();
+		setSkewXRad(oldSkewX + rotation-oldRotation);
+		setSkewYRad(rotation);
+	}
+	public function setRotation(rotation:Float):Void
+	{
+		setRotationRad(rotation*DEG2RAD);
 	}
 
-     public static function setSkewYRadians(m:Matrix, skewY:Float):Void
-     {
-          var scaleX:Float = getScaleX(m);
-          m.a = scaleX * Math.cos(skewY);
-          m.b = scaleX * Math.sin(skewY);
-     }
+    public function getRotation():Float { return getRotationRad()*DEG2RAD; }
+   	public function getRotationRad():Float { return getSkewYRad(); }*/
 
-     public static function setSkewX(m:Matrix, skewX:Float):Void
-     {
-          setSkewXRadians(m, skewX*DEG2RAD);
-     }
 
-     public static function setSkewY(m:Matrix, skewY:Float):Void
-     {
-          var m = getMatrix();
-          setSkewYRadians(m, skewY*DEG2RAD);
-     }
-     */
-
-/*	public static function setRotationRadians(m:Matrix, rotation:Float):Void
-	{
-		var oldRotation:Float = getRotationRadians(m);
-		var oldSkewX:Float = getSkewXRadians(m);
-		setSkewXRadians(m, oldSkewX + rotation-oldRotation);
-		setSkewYRadians(m, rotation);		
-	}*/
-/*	public static function setRotation(m:Matrix, rotation:Float):Void
-	{
-		setRotationRadians(m, rotation*DEG2RAD);
-	}
-    public static function matchInternalPointWithExternal(m:Matrix, internalPoint:Point, externalPoint:Point):Void
-	{
-		var internalPointTransformed:Point = m.transformPoint(internalPoint);
-		var dx:Float = externalPoint.x - internalPointTransformed.x;
-		var dy:Float = externalPoint.y - internalPointTransformed.y;	
-		m.tx += dx;
-		m.ty += dy;
-	}*/
+	// #########################################################################
+	// #########################################################################
 
 }
 
