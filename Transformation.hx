@@ -126,7 +126,7 @@ class Transformation
         return target.transform.matrix.clone();
     }
 
-    public function setTo(a:Float,b:Float,c:Float,d:Float,tx:Float,ty:Float) {
+    public function setMatrixTo(a:Float,b:Float,c:Float,d:Float,tx:Float,ty:Float) {
     	var m:Matrix = new Matrix(a,b,c,d,tx,ty);
     	setMatrix(m,true);
     }
@@ -242,26 +242,18 @@ class Transformation
 
 
 	// Skew in Radians
-	//TODO skew need to be rewritten to be reliable
-	public function setSkewRad(skewRad:Float=null, ?skewYRad:Float=null):Void
+	public function setSkewRad(skewXRad:Float=null, ?skewYRad:Float=null):Void
 	{
 
-		var skewXRad:Float = skewRad;
-		// if not specified it will set the x and y skew using the same value
-		if (skewYRad==null) skewYRad = skewRad;
-
-		
-
         //get the target matrix to apply the transformation
-	    //var m:Matrix = new Matrix();
 	    var m:Matrix = getMatrix();
 
 		// apply the skew (matrix.c is HORIZONTAL, matrix.b is VERTICAL)
 	    if (skewXRad!=null) {
-	    	m.c = Math.tan(skewXRad);
+	    	m.c = Math.tan(skewXRad)*getScaleX();
 	    }
 	    if (skewYRad!=null) {
-	    	m.b = Math.tan(skewYRad);
+	    	m.b = Math.tan(skewYRad)*getScaleY();
 	    }
 
 		//apply the matrix to the target
@@ -286,13 +278,23 @@ class Transformation
 	public function setSkewYRad(skewYRad:Float=null):Void { setSkewRad(null,skewYRad); }
 
 	// Sum Skew in Radians
-	public function skewRad(skewRad:Float=0.0, ?skewYRad:Float=null):Void
+	public function skewRad(skewXRad:Float=0.0, skewYRad:Float=0.0):Void
 	{
-		var skewXRad:Float = getSkewXRad()+skewRad;
-		// if not specified it will set the x and y skew using the same value
-		if (skewYRad==null) skewYRad = getSkewYRad()+skewRad;
 
-		setSkewRad(skewXRad,skewYRad);
+        //get the target matrix to apply the transformation
+	    var m:Matrix = new Matrix();
+
+		// apply the skew (matrix.c is HORIZONTAL, matrix.b is VERTICAL)
+	    if (skewXRad!=0.0) {
+	    	m.c = Math.tan(skewXRad);
+	    }
+	    if (skewYRad!=0.0) {
+	    	m.b = Math.tan(skewYRad);
+	    }
+	    
+		//apply the matrix to the target
+	    m.concat(getMatrix());
+	    setMatrix(m,true);
 
 	}
 	// one parameter shortcuts
@@ -502,7 +504,9 @@ class Transformation
 	public function getRotationRad(angle:Float=0):Float 
 	{
 
-		//thanks to http://stackoverflow.com/users/1035293/bugshake
+		// apply the transformation matrix to a point and
+		// calculate the rotation happened\
+		// thanks to http://stackoverflow.com/users/1035293/bugshake
 
 		var translate:Point;
 		var scale:Float;
@@ -514,13 +518,13 @@ class Transformation
 		translate = m.transformPoint(p);
 		m.translate( -translate.x, -translate.y);
 
-		// extract (uniform) scale
+		// extract (uniform) scale...
 		p.x = 1.0;
 		p.y = 0.0;
 		p = m.transformPoint(p);
 		scale = p.length;
 
-		// and rotation
+		// ...and rotation
 		return Math.atan2(p.y, p.x);
 	}
 	// Set rotation in Degrees
