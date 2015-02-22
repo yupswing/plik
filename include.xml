@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension>
+	
+	<haxedef name="akifox-lib"/>
+	<set name="akifox-lib"/>
+	<haxelib name="akifox-lib" />
+	
+</extension>
