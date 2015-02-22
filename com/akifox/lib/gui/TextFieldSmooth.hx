@@ -1,5 +1,5 @@
 
-package akifox.gui;
+package com.akifox.lib.gui;
 
 import openfl.text.Font;
 import openfl.text.TextField;

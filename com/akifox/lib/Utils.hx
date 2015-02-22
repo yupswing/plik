@@ -1,4 +1,4 @@
-package akifox;
+package com.akifox.lib;
 import openfl.Lib;
 
 class Utils

@@ -1,4 +1,4 @@
-package akifox.debug;
+package com.akifox.lib.debug;
 import haxe.Timer;
 import openfl.display.FPS;
 import openfl.events.Event;
@@ -6,7 +6,7 @@ import openfl.system.System;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.Assets;
-import akifox.Utils;
+import com.akifox.lib.Utils;
 
 /**
  * FPS class extension to display memory usage.
