@@ -17,14 +17,16 @@ class Transformation
     public static var DEG2RAD:Float = Math.PI/180;
     public static var RAD2DEG:Float = 180/Math.PI;
 
-    // Pivot Point Anchors (used by setInternalPoint and getAnchoredPivot)
-    public inline static var TOP:Int = 0;
-    public inline static var MIDDLE:Int = 1;
-    public inline static var BOTTOM:Int = 2;
-    public inline static var LEFT:Int = 0;
-    public inline static var CENTER:Int = 1;
-    public inline static var RIGHT:Int = 2;
+    // Pivot Point Anchors (used by setAnchoredPivot and getAnchoredPivot)
+    public inline static var LEFT:Int = 0;    // x value
+    public inline static var CENTER:Int = 1;  // x value
+    public inline static var RIGHT:Int = 2;   // x value
+    public inline static var TOP:Int = 0;     // y value
+    public inline static var MIDDLE:Int = 1;  // y value
+    public inline static var BOTTOM:Int = 2;  // y value
 
+    // the pivot anchor point (using Pivot Point Anchors)
+    // example: Point(Transformation.LEFT,Transformation.MIDDLE)
     private var anchor:Point = null;
 
     // the pivot offset
@@ -33,11 +35,11 @@ class Transformation
 	// the target object
 	private var target:DisplayObject;
 
-	// original target properties
-    private var realX:Float; //original x
-    private var realY:Float; //original y
-    private var realWidth:Float; //original width
-    private var realHeight:Float; //original height
+	// target properties
+    private var realX:Float;
+    private var realY:Float;
+    private var realWidth:Float;
+    private var realHeight:Float;
 
     // Instance
     //  var trf = new Transformation(target);
@@ -51,7 +53,7 @@ class Transformation
 		realY = target.y;
 
 		if (pivot==null) {
-			//set the pivot point TOPLEFT of the target
+			//set the pivot point TOPLEFT of the target if nothing specified
 			setAnchoredPivot(Transformation.LEFT,Transformation.TOP);
 		} else {
 			//set the pivot point to the specified coords
@@ -81,7 +83,7 @@ class Transformation
     	if (anchor!=null) setAnchoredPivot(Std.int(anchor.x),Std.int(anchor.y));
 
     	// restore the transformation
-    	this.setMatrix(currentMatrix);
+    	this.setMatrixInternal(currentMatrix);
 
     	// restore the original translation
         // (the new given anchored pivot will count)
@@ -90,86 +92,113 @@ class Transformation
 
 
 
-    // SETTERs
+    // PIVOT MANAGMENT
 	// #########################################################################
 
+    // Pivot Point Anchors
+    // -------------------
+    // X: Transformation.LEFT | Transformation.CENTER | Transformation.RIGHT
+    // Y: Transformation.TOP | Transformation.MIDDLE | Transformation.BOTTOM
+    //
+	//     0,0 - 1,0 - 2,0    x=> LEFT=0 CENTER=1 RIGHT=2
+	//      |     |     |     y=> TOP=0 MIDDLE=1 BOTTOM=2
+	//     0,1 - 1,1 - 2,1
+	//      |     |     |
+	//     0,2 - 1,2 - 2,2
+
+	// set the pivot in the Pivot Point Anchor specified
 	public function setAnchoredPivot(pivotPositionX:Int,pivotPositionY:Int) {
+		//set the Pivot Point Anchor as specified
 		anchor = new Point(pivotPositionX,pivotPositionY);
+		//set the pivot offset based on the Pivot Point Anchor specified
 		offsetPoint = getAnchoredPivotOffset(pivotPositionX,pivotPositionY);
 	}
 
+	// set the pivot in an arbitrary point
 	public function setPivot(point:Point) {
+		//unset the Pivot Point Anchor
 		anchor = null;
+		//set the pivot offset
 		offsetPoint = inverseTransformPoint(point);
 	}
 
+	// set the pivot offset (from target 0,0) in an arbitrary point
 	public function setPivotOffset(point:Point) {
+		//unset the Pivot Point Anchor
 		anchor = null;
+		//set the pivot offset
 		offsetPoint = point;
 	}
 
-
-
-    // GETTERs
-	// #########################################################################
-
-	public function getPivotOffset():Point {
-		return offsetPoint;
-	}
-
+	// get the pivot absolute position
 	public function getPivot():Point {
 		return transformPoint(offsetPoint);
 	}
 
-	private function getAnchorPivot(pivotPositionX:Int,pivotPositionY:Int,absolute:Bool):Point {
-		// PIVOT POINTS (pivotPosition argument)
-		// 0,0 - 1,0 - 2,0    x=> LEFT=0 CENTER=1 RIGHT=2
-		//  |     |     |     y=> TOP=0 MIDDLE=1 BOTTOM=2
-		// 0,1 - 1,1 - 2,1
-		//  |     |     |
-		// 0,2 - 1,2 - 2,2
-
-		var x = realWidth/2*pivotPositionX;
-		var y = realHeight/2*pivotPositionY;
-		if (absolute) {
-			var pos = getPosition();
-			x+=pos.x;
-			y+=pos.y;
-		}
-		return new Point(x,y);
+	// get the pivot offset (from target 0,0) position
+	public function getPivotOffset():Point {
+		return offsetPoint;
 	}
 
+	// get the offset (from target 0,0) position of a specified Pivot Point Anchor
 	public function getAnchoredPivotOffset(?pivotPositionX:Int=0,?pivotPositionY:Int=0):Point {
 		return getAnchorPivot(pivotPositionX,pivotPositionY,false);
 	}
 
+	// get the position of a specified Pivot Point Anchor
 	public function getAnchoredPivot(?pivotPositionX:Int=0,?pivotPositionY:Int=0):Point 
 	{
 		return getAnchorPivot(pivotPositionX,pivotPositionY,true);
 	}
 
+	// internal (used by getAnchoredPivotOffset and getAnchoredPivot)
+	private function getAnchorPivot(pivotPositionX:Int,pivotPositionY:Int,absolute:Bool):Point {
+		// realWidth / 2 * 0 is LEFT      .______
+		// realWidth / 2 * 1 is CENTER    ___.___
+		// realWidth / 2 * 2 is RIGHT     ______.
+		// and so on for the Y
+		var x = realWidth/2*pivotPositionX;
+		var y = realHeight/2*pivotPositionY;
+
+		// add the current translation to the point
+		// to get the absolute position
+		if (absolute) {
+			var translation = getPosition();
+			x+=translation.x; // pos.x is matrix.tx
+			y+=translation.y; // pos.y is matrix.ty
+		}
+		return new Point(x,y);
+	}
+
 	// #########################################################################
 
 
-    public function setMatrix(m:Matrix,?adjust=false):Void
+    private function setMatrixInternal(m:Matrix,?adjust=false):Void
     {
+    	// adjust==true is needed to respect the Pivot Point
+
     	var originalPoint:Point = new Point(0,0);
-    	if (adjust) originalPoint = getPivot(); //this before apply the transform
+    	if (adjust) originalPoint = getPivot();  //this before apply the transform
+        target.transform.matrix = m; 			 //apply the transformation
+        if (adjust) adjustOffset(originalPoint); //this after apply the transform
+    }
 
-    	//apply the transformation
-        target.transform.matrix = m;
+    public function setMatrix(m:Matrix):Void { 
+    	// change the matrix and adjust to respect the Pivot Point
+    	setMatrixInternal(m,true);
+    }
 
-        if (adjust) adjustOffset(originalPoint);   //this after apply the transform
+
+    public function setMatrixTo(a:Float,b:Float,c:Float,d:Float,tx:Float,ty:Float) {
+    	// make a matrix with the specified parameters
+    	var m:Matrix = new Matrix(a,b,c,d,tx,ty);
+    	// update the matrix and adjust to respect the Pivot Point
+    	setMatrixInternal(m,true);
     }
 
     public function getMatrix():Matrix
     {
         return target.transform.matrix.clone();
-    }
-
-    public function setMatrixTo(a:Float,b:Float,c:Float,d:Float,tx:Float,ty:Float) {
-    	var m:Matrix = new Matrix(a,b,c,d,tx,ty);
-    	setMatrix(m,true);
     }
 
 
@@ -194,7 +223,7 @@ class Transformation
 	    m.ty-=offset.y;
 
 		//apply the matrix to the target
-	    setMatrix(m);
+	    setMatrixInternal(m);
 
 	}
 
@@ -206,21 +235,28 @@ class Transformation
 	// Transform a point using the current matrix
 
     public function transformPoint(point:Point):Point {
+        // apply the current transformation on a point
         return target.transform.matrix.transformPoint(point);
     }
 
     public function deltaTransformPoint(point:Point):Point {
-    	// Ignore the translation
+        // apply the current transformation on a point
+        // [ignore the translation]
         return target.transform.matrix.deltaTransformPoint(point);
     }
 
     public function inverseTransformPoint(point:Point):Point {
+        // remove the current transformation on a point
+        // (give a transformed point to get a 'identity' point)
     	var m:Matrix = getMatrix();
     	m.invert();
         return m.transformPoint(point);
     }
 
     public function inverseDeltaTransformPoint(point:Point):Point {
+        // remove the current transformation on a point
+        // (give a transformed point to get a 'identity' point)
+        // [ignore the translation]
     	var m:Matrix = getMatrix();
     	m.invert();
         return m.deltaTransformPoint(point);
@@ -236,7 +272,7 @@ class Transformation
          var m = new Matrix();
          m.tx = realX - offsetPoint.x;
          m.ty = realY - offsetPoint.y;
-         setMatrix(m);
+         setMatrixInternal(m);
     }
 
 
@@ -251,7 +287,7 @@ class Transformation
 	    var m:Matrix = getMatrix();
 	    m.tx += dx;
 	    m.ty += dy;
-	    setMatrix(m);
+	    setMatrixInternal(m);
 	}
 	public function translateX(dx:Float=0):Void { translate(dx,0); } 
 	public function translateY(dy:Float=0):Void { translate(0,dy); }    
@@ -263,17 +299,17 @@ class Transformation
 	    var transformedOffset:Point = deltaTransformPoint(offsetPoint);
 	    m.tx = transaltion.x-transformedOffset.x;
 	    m.ty = transaltion.y-transformedOffset.y;
-	    setMatrix(m);
+	    setMatrixInternal(m);
 	}
 	public function setTranslationX(tx:Float=0):Void {
 	    var m:Matrix = getMatrix();
 	    m.tx = tx-deltaTransformPoint(offsetPoint).x;
-	    setMatrix(m);
+	    setMatrixInternal(m);
 	} 
 	public function setTranslationY(ty:Float=0):Void {
 	    var m:Matrix = getMatrix();
 	    m.ty = ty-deltaTransformPoint(offsetPoint).y;
-	    setMatrix(m);
+	    setMatrixInternal(m);
 	}   
 
 	public function getTranslation():Point
@@ -325,7 +361,7 @@ class Transformation
 	    }
 
 		//apply the matrix to the target
-	    setMatrix(m,true);
+	    setMatrixInternal(m,true);
 	}
 
 	// Skew in Degrees
@@ -362,7 +398,7 @@ class Transformation
 	    
 		//apply the matrix to the target
 	    m.concat(getMatrix());
-	    setMatrix(m,true);
+	    setMatrixInternal(m,true);
 
 	}
 	// one parameter shortcuts
@@ -420,7 +456,7 @@ class Transformation
 		m.ty *= yFactor;
 
 		//apply the matrix to the target
-	    setMatrix(m,true);
+	    setMatrixInternal(m,true);
 
 	}
 
@@ -457,7 +493,7 @@ class Transformation
 			m.a = Math.cos(skewYRad) * scaleX;
 			m.b = Math.sin(skewYRad) * scaleX;
 		}
-		setMatrix(m,true);
+		setMatrixInternal(m,true);
 	}
 
 	public function setScaleY(scaleY:Float):Void
@@ -477,7 +513,7 @@ class Transformation
 			m.c = -Math.sin(skewXRad) * scaleY;
 			m.d =  Math.cos(skewXRad) * scaleY;
 		}
-		setMatrix(m,true);
+		setMatrixInternal(m,true);
 	}
 
 
@@ -542,7 +578,7 @@ class Transformation
 		m.ty+=absolutePoint.y;
 
 		//apply the matrix to the target
-		setMatrix(m);
+		setMatrixInternal(m);
 	}
 
 	// Rotate in Degrees
