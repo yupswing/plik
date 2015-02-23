@@ -43,7 +43,7 @@ class TextFieldSmooth extends Bitmap
 	    textField.text = text;
 		var nw = Std.int(textField.textWidth);
 		var nh = Std.int(textField.textHeight);	    
- 	    textFieldBitmapData = new BitmapData(nw, nh, false, 0xFF0000);
+ 	    textFieldBitmapData = new BitmapData(nw, nh, true, 0x000000);
     	textFieldBitmapData.draw(textField);
 	    bitmapData = textFieldBitmapData;
 	    return text;
@@ -73,17 +73,8 @@ class TextFieldSmooth extends Bitmap
 		//prepare the TextFormat
 	    var textFieldFormat:TextFormat = new TextFormat(textFieldFont.fontName, textFieldSize , textFieldColor);
 
-/*	    switch(textFieldAlign){
-	    	case 'RIGHT':
-	    		textFieldFormat.align = TextFormatAlign.RIGHT;
-	    		textField.autoSize = TextFieldAutoSize.RIGHT;
-	    	case 'CENTER':
-	    		textFieldFormat.align = TextFormatAlign.CENTER;
-	    		textField.autoSize = TextFieldAutoSize.CENTER;
-	    	default:*/
-	    		textFieldFormat.align = TextFormatAlign.LEFT;
-	    		textField.autoSize = TextFieldAutoSize.LEFT;
-	    // }
+	    textFieldFormat.align = TextFormatAlign.LEFT;
+	    textField.autoSize = TextFieldAutoSize.LEFT;
 
 	    textField.defaultTextFormat = textFieldFormat;
 	    textField.embedFonts = true;
