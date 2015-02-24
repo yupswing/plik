@@ -6,6 +6,7 @@ import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.text.TextFormatAlign;
 import openfl.text.TextFieldAutoSize;
+import openfl.text.AntiAliasType;
 
 // TODO Editing going on to support transformations
 // will be finished when Transform.hx is done
@@ -75,7 +76,7 @@ class TextFieldSmooth extends Bitmap
 
 	    textFieldFormat.align = TextFormatAlign.LEFT;
 	    textField.autoSize = TextFieldAutoSize.LEFT;
-
+	    textField.antiAliasType = AntiAliasType.ADVANCED;
 	    textField.defaultTextFormat = textFieldFormat;
 	    textField.embedFonts = true;
 	    textField.selectable = false;

@@ -1,12 +1,17 @@
 package com.akifox.lib.debug;
 import haxe.Timer;
 import openfl.display.FPS;
+import openfl.display.Sprite;
+import openfl.display.BitmapData;
+import openfl.display.Bitmap;
+import openfl.geom.Rectangle;
 import openfl.events.Event;
 import openfl.system.System;
 import openfl.text.TextField;
+import openfl.text.Font;
 import openfl.text.TextFormat;
 import openfl.Assets;
-import com.akifox.lib.Utils;
+import openfl.Lib;
 
 /**
  * FPS class extension to display memory usage.
@@ -14,32 +19,49 @@ import com.akifox.lib.Utils;
  *	var performance:Performance = new Performance(10, 10, 0x000000);
  *  addChild(performance);
  */
-class Performance extends TextField
+class Performance extends Sprite
 {
 	private var times:Array<Float>;
 	private var memPeak:Float = 0;
     private var skipped = 0;
-    var skip = 10;
+    private var skip = 10;
 
-	public function new(inX:Float = 10.0, inY:Float = 10.0, inCol:Int = 0x000000) 
+    public var performanceText:TextField;
+
+    private var bound:Bitmap;
+    private var boundData:BitmapData;
+
+    private var scene:Dynamic;
+
+	public function new(scene:Dynamic,font:Font) 
 	{
 		super();
 		
-		x = inX;
-		y = inY;
-		selectable = false;
-		
-		defaultTextFormat = new TextFormat("_sans", 12, inCol);
-		
-		text = "FPS: ";
+		x = 0;
+		y = 0;
+    	performanceText = new TextField();
+    	performanceText.x = 6;
+    	performanceText.y = 6;
+    	performanceText.width = 500;
+		performanceText.selectable = false;
+		performanceText.defaultTextFormat = new TextFormat(font.fontName, 12, 0xFFFFFF);
+		performanceText.text = "Performance";
+		performanceText.embedFonts = true;
+
+		this.scene = scene;
+
+		bound = new Bitmap();
+		onResize(null);
+
+		addChild(bound);
+		addChild(performanceText);
 		
 		times = [];
-		addEventListener(Event.ENTER_FRAME, onEnter);
-		width = 150;
-		height = 70;
+		Lib.current.stage.addEventListener(Event.ENTER_FRAME, onEnter);
+		Lib.current.stage.addEventListener(Event.RESIZE, onResize);
 	}
-	
-	private function onEnter(_)
+
+	private function onEnter(_):Void
 	{	
 		var now = Timer.stamp();
 		times.push(now);
@@ -54,10 +76,17 @@ class Performance extends TextField
             
             if (visible)
             {	
-                text = "FPS: " + times.length + "\nMEM: " + mem + " MB\nMEM peak: " + memPeak + " MB";	
+                performanceText.text = "FPS: " + times.length + "\nMEM: " + mem + " MB\nMEM peak: " + memPeak + " MB";	
             }
         }
         skipped++;
+	}
+
+	private function onResize(_):Void
+	{
+		boundData = new BitmapData(Lib.current.stage.stageWidth,50);
+		boundData.fillRect(new Rectangle(0,0,Lib.current.stage.stageWidth,50),0xAA000000);
+		bound.bitmapData = boundData;
 	}
 	
 }
