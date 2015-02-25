@@ -8,8 +8,7 @@ import openfl.events.Event;
  */
 interface IScreen
 {				
-	public function initialize():Void;
-	//function update(deltaTime:Float):Void;		
+	public function initialize():Void;	
 	public function unload():Void;
 	public function resize(screenWidth:Int,screenHeight:Int):Void;
 }
