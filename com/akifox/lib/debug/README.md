@@ -10,10 +10,10 @@ http://haxecoder.com/post.php?id=24
 # Info
 The class (if added as a child of a DisplayObject, like a Sprite) shows a bar (as small as possible, according to the font) with few useful information when you are in a development phase.
 
-First is the logo (useful for screenshots)
-Second are the app info (directly from your project.xml, still for screenshots)
-Third is the FPS Graph that show the color coded perfomance of your frame rate in the last 30 seconds
-And finally fourth are the current FPS, memory usage and memory peak. (note: all flash instances share the same memory)
+- your logo (useful for screenshots)
+- app info (directly from your project.xml, still for screenshots) [**NOTE:** not available in flash]
+- FPS Graph that show the color coded perfomance of your frame rate in the last 30 seconds
+- current FPS, memory usage and memory peak. [**NOTE:** all flash instances share the same memory]
 
 # Usage
 Copy the class in your project (or use this library if you prefer) and in your main add it as a child

@@ -66,7 +66,7 @@ class Performance extends Sprite
 		super();
 
 		this.showGraph = showGraph;
-		
+
 		x = 0;
 		y = 0;
 
@@ -103,6 +103,7 @@ class Performance extends Sprite
 			nextX = logo.x + logoSize + padding;
 		}
 
+		#if !flash
 		/// ### APP TEXT
 		if (showAppText) {
 	    	appText = new TextField();
@@ -115,6 +116,7 @@ class Performance extends Sprite
 			appText.embedFonts = true;
 			nextX = appText.x+appText.textWidth+padding;
 		}
+		#end
 
 		/// ### GRAPH
 		if (showGraph) {
@@ -133,7 +135,9 @@ class Performance extends Sprite
 		onResize(null);
 		addChild(bound);
 		if (logoData!=null) addChild(logo);
+		#if !flash
 		if (showAppText) addChild(appText);
+		#end
 		if (showGraph) addChild(graph);
 		addChild(performanceText);
 		
