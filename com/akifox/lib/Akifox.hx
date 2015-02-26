@@ -26,6 +26,8 @@ class Akifox
 
 	public static var id:String = "";
 
+	private static var inTransition:Bool = false;
+
 	public static function initialize(screenContainer:DisplayObjectContainer,appid:String):Void {								
 		if (screenContainer != null){
 			_screenContainer = screenContainer;			
@@ -44,20 +46,30 @@ class Akifox
 		if(_currentScene==null) return;
 		switch (event.keyCode) {
 			case Keyboard.P:
-				if(_currentScene.paused) _currentScene.play();
-				else _currentScene.pause();
+				if(_currentScene.paused) play();
+				else pause();
 		}
 	}
 
-	private static function focus(event:FocusEvent):Void {
-		if(_currentScene!=null) _currentScene.play();
-		trace('focus in');
+	private static function pause():Void {
+		if (_currentScene==null) return;
+		if (_currentScene.pausable) {
+			if (inTransition) _currentScene.paused = true; // start() will handle it
+			else _currentScene.pause();
+			trace(_currentScene.paused);
+		}
 	}
 
-	private static function defocus(event:FocusEvent):Void {
-		if(_currentScene!=null) _currentScene.pause();
-		trace('focus out');
+	private static function play():Void {
+		if (_currentScene==null) return;
+			if (inTransition) _currentScene.paused = false; // start() will handle it
+			else _currentScene.play();
+			trace(_currentScene.paused);
 	}
+
+	private static function focus(event:FocusEvent):Void { play(); }
+
+	private static function defocus(event:FocusEvent):Void { pause(); }
 
 
 	//##########################################################################################
@@ -115,6 +127,8 @@ class Akifox
 		trace('load');
 
 		if (_screenContainer != null) {
+
+			inTransition = true;
 
 			currentWidth = Lib.current.stage.stageWidth;
 			currentHeight = Lib.current.stage.stageHeight;
@@ -232,6 +246,7 @@ class Akifox
 		deleteGhost();
 		_currentScene.alpha = 1;
 		trace('start');
+		inTransition = false;
 		_currentScene.start();
 	}
 

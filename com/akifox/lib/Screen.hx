@@ -27,6 +27,7 @@ class Screen extends Sprite
 	private var resizePow:Bool = false;
 
 	public var paused:Bool = false;
+	public var pausable:Bool = true;
 	private var cycle:Bool = false;
 
 
@@ -49,26 +50,25 @@ class Screen extends Sprite
 
 	// call at the unloading
 	public function unload():Void {
-		this.pause();
+		pause();
 	}
 
 	// the screen is ready
-	public function start():Void { }
+	public function start():Void {
+		if (paused) pause(); //handle the pause triggered during transitions Akifox
+	}
 
 	public function play():Void {
-		if (!paused) return;
+		if (!paused) return; //not double listeners
 		paused = false;
 		if (cycle) Lib.current.stage.addEventListener(Event.ENTER_FRAME, onUpdate);
 		Actuate.resumeAll();
-		trace('play');
 	}
 
 	public function pause():Void {
-		if (paused) return;
 		if (cycle) Lib.current.stage.removeEventListener(Event.ENTER_FRAME, onUpdate);
 		Actuate.pauseAll();
 		paused = true;
-		trace('pause');
 	}
 
 	private function onUpdate(event:Event) {
