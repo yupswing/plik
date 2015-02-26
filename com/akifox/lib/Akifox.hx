@@ -21,13 +21,16 @@ import com.akifox.lib.screens.IScreen;
 class Akifox
 {
 
-	
-	public static function initialize(screenContainer:DisplayObjectContainer):Void {								
+	public static var id:String = "";
+
+	public static function initialize(screenContainer:DisplayObjectContainer,appid:String):Void {								
 		if (screenContainer != null){
 			_screenContainer = screenContainer;			
 		} else {
 			throw new Error("AKIFOX Error: Cannot initialize screen container. The value is null.");
 		}
+		id = Data.id = appid;
+		_transition_mode = Constants.TRANSITION_NONE;
 	}
 
 
@@ -37,13 +40,21 @@ class Akifox
 	//
 	//##########################################################################################
 
-	public static inline var _transition_offset = 250; //offset drawing for the ghost
-	public static inline var _transition_span = 100; // distance between slides
+	public static inline var _transition_offset = 300; // offset drawing for the ghost
+	public static inline var _transition_span = 250; // distance between slides
 
 	private static var _currentScene(default, null):IScreen;
 	private static var _screenContainer:DisplayObjectContainer;
 
 	public static var _transition_mode:String = ""; // USE Constants.TRANSITION_XXX
+	private static var _transition_ghost_old:Bitmap;
+	private static var _transition_ghost_new:Bitmap;
+
+
+	private static var currentWidth:Float;
+	private static var currentHeight:Float;
+	private static var sceneX:Float;
+	private static var sceneY:Float;
 	
 /*	private static var previousTime:Int = 0;	
 	public static function update():Void {
@@ -59,33 +70,43 @@ class Akifox
 		_currentScene.resize(screenWidth,screenHeight);
 	}
 	
-	private static var _transition_ghost:Bitmap;
 	private static function deleteGhost():Void {
-		if (_transition_ghost==null) return;
-		_screenContainer.removeChild(_transition_ghost);
-		_transition_ghost = null;
+		Actuate.stop(_transition_ghost_old);
+		Actuate.stop(_transition_ghost_new);
+		if (_transition_ghost_new!=null) {
+			_screenContainer.removeChild(_transition_ghost_new);
+			_transition_ghost_new.bitmapData.dispose();
+			_transition_ghost_new = null;
+		}
+		if (_transition_ghost_old!=null) {
+			_screenContainer.removeChild(_transition_ghost_old);
+			_transition_ghost_old.bitmapData.dispose();
+			_transition_ghost_old = null;
+		}
 	}
 	
 	public static function loadScreen(newScreen:IScreen,?transition:String=""):Void {
+		trace('load');
 
 		if (_screenContainer != null) {
 
-			Actuate.stop(_transition_ghost);
-			_transition_ghost = null;
+			currentWidth = Lib.current.stage.stageWidth;
+			currentHeight = Lib.current.stage.stageHeight;
 
-			if (transition != "") _transition_mode = transition;
+			deleteGhost();
+			//if (transition != "") _transition_mode = transition;
 
 			if (_currentScene != null) {
 				Actuate.stop(cast _currentScene);
 
-				if (transition != Constants.TRANSITION_NONE) {
-					_transition_ghost = new Bitmap(Utils.makeBitmap(cast _currentScene,_transition_offset));
-					_transition_ghost.smoothing = true;
-					_transition_ghost.alpha = 1;
-					_transition_ghost.visible = true;
-					_transition_ghost.x=-_transition_offset;
-					_transition_ghost.y=-_transition_offset;
-					_screenContainer.addChild(_transition_ghost);
+				if (_transition_mode != Constants.TRANSITION_NONE) {
+					_transition_ghost_old = new Bitmap(Utils.makeBitmap(cast _currentScene,currentWidth,currentHeight,_transition_offset,false));
+					_transition_ghost_old.smoothing = false;
+					_transition_ghost_old.alpha = 1;
+					_transition_ghost_old.visible = true;
+					_transition_ghost_old.x=-_transition_offset;
+					_transition_ghost_old.y=-_transition_offset;
+					_screenContainer.addChild(_transition_ghost_old);
 				}
 
 				_screenContainer.removeChild(cast _currentScene);
@@ -112,40 +133,80 @@ class Akifox
 			
 			newScreen.initialize();
 			_currentScene = newScreen;
+			cast(_currentScene, Sprite).alpha = 0;
+
+			sceneX = cast(_currentScene,Sprite).x;
+			sceneY = cast(_currentScene,Sprite).y;
+
 			_screenContainer.addChild(cast _currentScene);
-
-			var currentWidth = Lib.current.stage.stageWidth;
-			var currentHeight = Lib.current.stage.stageHeight;
-			var sceneX = cast(_currentScene,Sprite).x;
-			var sceneY = cast(_currentScene,Sprite).y;
-			var timing = 0.5;
-
-			var ghostEase = Sine.easeIn;
-			var sceneEase = Expo.easeOut;
-
-			switch (_transition_mode) {
-				case Constants.TRANSITION_ALPHA:
-					cast(_currentScene, Sprite).alpha = 0;
-					if (_transition_ghost!=null) Actuate.tween (_transition_ghost, timing, { alpha: 0 }).onComplete(deleteGhost);	
-					Actuate.tween (_currentScene, timing, { alpha: 1 });
-				case Constants.TRANSITION_SLIDE_DOWN:
-					cast(_currentScene, Sprite).y += currentHeight+_transition_span;
-					if (_transition_ghost!=null) Actuate.tween (_transition_ghost, timing, { y: -currentHeight-_transition_span-_transition_offset }).ease(ghostEase).onComplete(deleteGhost);	
-					Actuate.tween (_currentScene, timing, { y: sceneY }).ease(sceneEase);
-				case Constants.TRANSITION_SLIDE_UP:
-					cast(_currentScene, Sprite).y -= currentHeight+_transition_span;
-					if (_transition_ghost!=null) Actuate.tween (_transition_ghost, timing, { y: currentHeight+_transition_span-_transition_offset }).ease(ghostEase).onComplete(deleteGhost);	
-					Actuate.tween (_currentScene, timing, { y: sceneY }).ease(sceneEase);
-				case Constants.TRANSITION_SLIDE_RIGHT:
-					cast(_currentScene, Sprite).x += currentWidth+_transition_span;
-					if (_transition_ghost!=null) Actuate.tween (_transition_ghost, timing, { x: -currentWidth-_transition_span-_transition_offset }).ease(ghostEase).onComplete(deleteGhost);	
-					Actuate.tween (_currentScene, timing, { x: sceneX }).ease(sceneEase);
-				case Constants.TRANSITION_SLIDE_LEFT:
-					cast(_currentScene, Sprite).x -= currentWidth+_transition_span;
-					if (_transition_ghost!=null) Actuate.tween (_transition_ghost, timing, { x: currentWidth+_transition_span-_transition_offset }).ease(ghostEase).onComplete(deleteGhost);	
-					Actuate.tween (_currentScene, timing, { x: sceneX }).ease(sceneEase);
-			}
 		}
+		trace('loaded');
+	}
+
+
+	public static function sceneReady():Void {
+		trace('ready');
+
+		if (_transition_mode == Constants.TRANSITION_NONE) {
+			sceneStart();
+			return;
+		}
+
+		_transition_ghost_new = new Bitmap(Utils.makeBitmap(cast _currentScene,currentWidth,currentHeight,_transition_offset,true));
+		_transition_ghost_new.smoothing = false;
+		_transition_ghost_new.alpha = 1;
+		_transition_ghost_new.visible = true;
+		_transition_ghost_new.x=-_transition_offset;
+		_transition_ghost_new.y=-_transition_offset;
+		_screenContainer.addChild(_transition_ghost_new);
+
+		var timing = 1;
+		var delay = #if mobile 0.2 #else 0 #end; //ios needs bit of delay
+
+		var ghostEase = Sine.easeIn;
+		var sceneEase = Expo.easeOut;
+
+		switch (_transition_mode) {
+			case Constants.TRANSITION_ALPHA:
+				_transition_ghost_new.alpha = 0;
+				if (_transition_ghost_old!=null) Actuate.tween (_transition_ghost_old, timing, { alpha: 0 }).delay(delay);
+				Actuate.tween (_transition_ghost_new, timing, { alpha: 1 }).delay(delay).onComplete(sceneStart);
+			case Constants.TRANSITION_SLIDE_UP:
+				_transition_ghost_new.y += currentHeight+_transition_span;
+				if (_transition_ghost_old!=null) {
+						Actuate.tween (_transition_ghost_old, timing, { y: -currentHeight-_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
+						Actuate.tween (_transition_ghost_old, timing/2+0.1, { alpha:0 }).ease(ghostEase).delay(timing/2+delay);
+					}
+				Actuate.tween (_transition_ghost_new, timing, { y: sceneY-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+			case Constants.TRANSITION_SLIDE_DOWN:
+				_transition_ghost_new.y -= currentHeight+_transition_span;
+				if (_transition_ghost_old!=null) {
+					Actuate.tween (_transition_ghost_old, timing, { y: currentHeight+_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
+					Actuate.tween (_transition_ghost_old, timing/2+0.1, { alpha:0 }).ease(ghostEase).delay(timing/2+delay);	
+				}
+				Actuate.tween (_transition_ghost_new, timing, { y: sceneY-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+			case Constants.TRANSITION_SLIDE_LEFT:
+				_transition_ghost_new.x += currentWidth+_transition_span;
+				if (_transition_ghost_old!=null) {
+					Actuate.tween (_transition_ghost_old, timing, { x: -currentWidth-_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
+					Actuate.tween (_transition_ghost_old, timing/2+0.1, { alpha:0 }).ease(ghostEase).delay(timing/2+delay);	
+				}
+				Actuate.tween (_transition_ghost_new, timing, { x: sceneX-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+			case Constants.TRANSITION_SLIDE_RIGHT:
+				_transition_ghost_new.x -= currentWidth+_transition_span;
+				if (_transition_ghost_old!=null) {
+					Actuate.tween (_transition_ghost_old, timing, { x: currentWidth+_transition_span-_transition_offset }).ease(ghostEase).delay(delay);	
+					Actuate.tween (_transition_ghost_old, timing/2+0.1, { alpha:0 }).ease(ghostEase).delay(timing/2+delay);
+				}
+				Actuate.tween (_transition_ghost_new, timing, { x: sceneX-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+		}
+	}
+
+	private static function sceneStart():Void{
+		deleteGhost();
+		cast(_currentScene, Sprite).alpha = 1;
+		trace('start');
+		_currentScene.start();
 	}
 
 

@@ -11,4 +11,5 @@ interface IScreen
 	public function initialize():Void;	
 	public function unload():Void;
 	public function resize(screenWidth:Int,screenHeight:Int):Void;
+	public function start():Void;
 }

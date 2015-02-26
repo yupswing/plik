@@ -34,10 +34,14 @@ class Utils
 		return true;
 	}
 
-	public static function makeBitmap(target:DisplayObject,offset:Int=0):BitmapData {
+	public static function makeBitmap(target:DisplayObject,?w:Float=0,?h:Float=0,?offset:Int=0,?transparent=true):BitmapData {
 		// bounds and size of parent in its own coordinate space
-		var rect:Rectangle = target.parent.getBounds(target);
-		var bmp:BitmapData = new BitmapData(Std.int(rect.width)+offset*2, Std.int(rect.height)+offset*2, true, Lib.current.stage.color);
+		if (w==0 || h==0) {
+			var rect:Rectangle = target.parent.getBounds(target);
+			w = rect.width;
+			h = rect.height;
+		}
+		var bmp:BitmapData = new BitmapData(Std.int(w)+offset*2, Std.int(h)+offset*2, transparent, Lib.current.stage.color);
 
 		// offset for drawing
 		var matrix:Matrix = target.transform.matrix.clone();//new Matrix();
