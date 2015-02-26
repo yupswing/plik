@@ -103,7 +103,7 @@ class Performance extends Sprite
 			nextX = logo.x + logoSize + padding;
 		}
 
-		#if !flash #if !html5
+		#if !flash #if !html5 #if !next
 		/// ### APP TEXT
 		if (showAppText) {
 	    	appText = new TextField();
@@ -116,7 +116,7 @@ class Performance extends Sprite
 			appText.embedFonts = true;
 			nextX = appText.x+appText.textWidth+padding;
 		}
-		#end #end
+		#end #end #end
 
 		/// ### GRAPH
 		if (showGraph) {
@@ -135,9 +135,9 @@ class Performance extends Sprite
 		onResize(null);
 		addChild(bound);
 		if (logoData!=null) addChild(logo);
-		#if !flash #if !html5
+		#if !flash #if !html5 #if !next
 		if (showAppText) addChild(appText);
-		#end #end
+		#end #end #end
 		if (showGraph) addChild(graph);
 		addChild(performanceText);
 		

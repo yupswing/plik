@@ -5,6 +5,7 @@ import openfl.text.Font;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
 import openfl.display.Stage;
+import openfl.display.StageDisplayState;
 import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
@@ -48,6 +49,8 @@ class Akifox
 			case Keyboard.P:
 				if(_currentScene.paused) play();
 				else pause();
+			case Keyboard.F:
+				toggleFullscreen();
 		}
 	}
 
@@ -56,7 +59,7 @@ class Akifox
 		if (_currentScene.pausable) {
 			if (inTransition) _currentScene.paused = true; // start() will handle it
 			else _currentScene.pause();
-			trace(_currentScene.paused);
+			//trace(_currentScene.paused);
 		}
 	}
 
@@ -64,7 +67,7 @@ class Akifox
 		if (_currentScene==null) return;
 			if (inTransition) _currentScene.paused = false; // start() will handle it
 			else _currentScene.play();
-			trace(_currentScene.paused);
+			//trace(_currentScene.paused);
 	}
 
 	private static function focus(event:FocusEvent):Void { play(); }
@@ -124,7 +127,7 @@ class Akifox
 	}
 	
 	public static function loadScreen(newScreen:Screen,?transition:String=""):Void {
-		trace('load');
+		//trace('load');
 
 		if (_screenContainer != null) {
 
@@ -180,12 +183,12 @@ class Akifox
 
 			_screenContainer.addChild(_currentScene);
 		}
-		trace('loaded');
+		//trace('loaded');
 	}
 
 
 	public static function sceneReady():Void {
-		trace('ready');
+		//trace('ready');
 
 		if (_transition_mode == Constants.TRANSITION_NONE) {
 			sceneStart();
@@ -245,7 +248,7 @@ class Akifox
 	private static function sceneStart():Void{
 		deleteGhost();
 		_currentScene.alpha = 1;
-		trace('start');
+		//trace('start');
 		inTransition = false;
 		_currentScene.start();
 	}
@@ -370,6 +373,21 @@ class Akifox
 		return false;
 	}
 
+
+
+
 	//##########################################################################################
+	//
+	// OTHERS
+	//
+	//##########################################################################################
+
+	private static function toggleFullscreen() {
+	if(Lib.current.stage.displayState != StageDisplayState.FULL_SCREEN_INTERACTIVE){
+		Lib.current.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+	}else {
+		Lib.current.stage.displayState = StageDisplayState.NORMAL;
+	}
+}
 
 }

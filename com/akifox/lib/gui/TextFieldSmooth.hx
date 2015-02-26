@@ -43,7 +43,9 @@ class TextFieldSmooth extends Bitmap
 	function set_text(text) {
 	    textField.text = text;
 		var nw = Std.int(textField.textWidth);
-		var nh = Std.int(textField.textHeight);	    
+		var nh = Std.int(textField.textHeight);
+		if (textFieldBitmapData != null) textFieldBitmapData.dispose();
+		textFieldBitmapData = null;
  	    textFieldBitmapData = new BitmapData(nw, nh, true, 0x000000);
     	textFieldBitmapData.draw(textField);
 	    bitmapData = textFieldBitmapData;
