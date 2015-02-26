@@ -7,6 +7,9 @@ import openfl.display.Sprite;
 import openfl.display.Stage;
 import openfl.errors.Error;
 import openfl.events.Event;
+import openfl.events.FocusEvent;
+import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import openfl.Lib;
 import openfl.display.BitmapData;
 import openfl.display.Bitmap;
@@ -16,7 +19,7 @@ import openfl.geom.Matrix;
 import motion.Actuate;
 import motion.easing.*;
 
-import com.akifox.lib.screens.IScreen;
+import com.akifox.lib.Screen;
 
 class Akifox
 {
@@ -31,6 +34,29 @@ class Akifox
 		}
 		id = Data.id = appid;
 		_transition_mode = Constants.TRANSITION_NONE;
+
+		Lib.current.stage.addEventListener(FocusEvent.FOCUS_IN,focus);
+		Lib.current.stage.addEventListener(FocusEvent.FOCUS_OUT,defocus);
+		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
+	}
+
+	private static function keyUp(event:KeyboardEvent) {
+		if(_currentScene==null) return;
+		switch (event.keyCode) {
+			case Keyboard.P:
+				if(_currentScene.paused) _currentScene.play();
+				else _currentScene.pause();
+		}
+	}
+
+	private static function focus(event:FocusEvent):Void {
+		if(_currentScene!=null) _currentScene.play();
+		trace('focus in');
+	}
+
+	private static function defocus(event:FocusEvent):Void {
+		if(_currentScene!=null) _currentScene.pause();
+		trace('focus out');
 	}
 
 
@@ -43,7 +69,7 @@ class Akifox
 	public static inline var _transition_offset = 300; // offset drawing for the ghost
 	public static inline var _transition_span = 250; // distance between slides
 
-	private static var _currentScene(default, null):IScreen;
+	private static var _currentScene(default, null):Screen;
 	private static var _screenContainer:DisplayObjectContainer;
 
 	public static var _transition_mode:String = ""; // USE Constants.TRANSITION_XXX
@@ -85,7 +111,7 @@ class Akifox
 		}
 	}
 	
-	public static function loadScreen(newScreen:IScreen,?transition:String=""):Void {
+	public static function loadScreen(newScreen:Screen,?transition:String=""):Void {
 		trace('load');
 
 		if (_screenContainer != null) {
@@ -94,13 +120,13 @@ class Akifox
 			currentHeight = Lib.current.stage.stageHeight;
 
 			deleteGhost();
-			//if (transition != "") _transition_mode = transition;
+			if (transition != "") _transition_mode = transition;
 
 			if (_currentScene != null) {
-				Actuate.stop(cast _currentScene);
+				Actuate.stop(_currentScene);
 
 				if (_transition_mode != Constants.TRANSITION_NONE) {
-					_transition_ghost_old = new Bitmap(Utils.makeBitmap(cast _currentScene,currentWidth,currentHeight,_transition_offset,false));
+					_transition_ghost_old = new Bitmap(Utils.makeBitmap(_currentScene,currentWidth,currentHeight,_transition_offset,false));
 					_transition_ghost_old.smoothing = false;
 					_transition_ghost_old.alpha = 1;
 					_transition_ghost_old.visible = true;
@@ -109,13 +135,13 @@ class Akifox
 					_screenContainer.addChild(_transition_ghost_old);
 				}
 
-				_screenContainer.removeChild(cast _currentScene);
+				_screenContainer.removeChild(_currentScene);
 				
-				if (cast(_currentScene, Sprite).numChildren != 0) {			
-					var i:Int = cast(_currentScene, Sprite).numChildren;			
+				if (_currentScene.numChildren != 0) {			
+					var i:Int = _currentScene.numChildren;			
 					do {
 						i--;
-						cast(_currentScene, Sprite).removeChildAt(i);												
+						_currentScene.removeChildAt(i);												
 					} while (i > 0);
 				}				
 				
@@ -133,12 +159,12 @@ class Akifox
 			
 			newScreen.initialize();
 			_currentScene = newScreen;
-			cast(_currentScene, Sprite).alpha = 0;
+			_currentScene.alpha = 0;
 
-			sceneX = cast(_currentScene,Sprite).x;
-			sceneY = cast(_currentScene,Sprite).y;
+			sceneX = _currentScene.x;
+			sceneY = _currentScene.y;
 
-			_screenContainer.addChild(cast _currentScene);
+			_screenContainer.addChild(_currentScene);
 		}
 		trace('loaded');
 	}
@@ -152,7 +178,7 @@ class Akifox
 			return;
 		}
 
-		_transition_ghost_new = new Bitmap(Utils.makeBitmap(cast _currentScene,currentWidth,currentHeight,_transition_offset,true));
+		_transition_ghost_new = new Bitmap(Utils.makeBitmap(_currentScene,currentWidth,currentHeight,_transition_offset,true));
 		_transition_ghost_new.smoothing = false;
 		_transition_ghost_new.alpha = 1;
 		_transition_ghost_new.visible = true;
@@ -204,7 +230,7 @@ class Akifox
 
 	private static function sceneStart():Void{
 		deleteGhost();
-		cast(_currentScene, Sprite).alpha = 1;
+		_currentScene.alpha = 1;
 		trace('start');
 		_currentScene.start();
 	}
