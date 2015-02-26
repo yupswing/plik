@@ -80,6 +80,7 @@ class Akifox
 
 				if (transition != Constants.TRANSITION_NONE) {
 					_transition_ghost = new Bitmap(Utils.makeBitmap(cast _currentScene,_transition_offset));
+					_transition_ghost.smoothing = true;
 					_transition_ghost.alpha = 1;
 					_transition_ghost.visible = true;
 					_transition_ghost.x=-_transition_offset;

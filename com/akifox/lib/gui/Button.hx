@@ -72,8 +72,6 @@ class Button extends Sprite
 		//_container.addChild(_bitmap);
 		//this.addChild(_container);
 		addChild(_bitmap);
-
-		trace(this);
 		
 /*		if (text != ""){
 			this.addChild(_textBitmap);		
