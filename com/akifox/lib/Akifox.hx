@@ -218,28 +218,28 @@ class Akifox
 				_transition_ghost_new.y += currentHeight+_transition_span;
 				if (_transition_ghost_old!=null) {
 						Actuate.tween (_transition_ghost_old, timing, { y: -currentHeight-_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
-						Actuate.tween (_transition_ghost_old, timing/2+0.1, { alpha:0 }).ease(ghostEase).delay(timing/2+delay);
+						Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
 					}
 				Actuate.tween (_transition_ghost_new, timing, { y: sceneY-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 			case Constants.TRANSITION_SLIDE_DOWN:
 				_transition_ghost_new.y -= currentHeight+_transition_span;
 				if (_transition_ghost_old!=null) {
 					Actuate.tween (_transition_ghost_old, timing, { y: currentHeight+_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
-					Actuate.tween (_transition_ghost_old, timing/2+0.1, { alpha:0 }).ease(ghostEase).delay(timing/2+delay);	
+					Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
 				}
 				Actuate.tween (_transition_ghost_new, timing, { y: sceneY-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 			case Constants.TRANSITION_SLIDE_LEFT:
 				_transition_ghost_new.x += currentWidth+_transition_span;
 				if (_transition_ghost_old!=null) {
 					Actuate.tween (_transition_ghost_old, timing, { x: -currentWidth-_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
-					Actuate.tween (_transition_ghost_old, timing/2+0.1, { alpha:0 }).ease(ghostEase).delay(timing/2+delay);	
+					Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
 				}
 				Actuate.tween (_transition_ghost_new, timing, { x: sceneX-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 			case Constants.TRANSITION_SLIDE_RIGHT:
 				_transition_ghost_new.x -= currentWidth+_transition_span;
 				if (_transition_ghost_old!=null) {
 					Actuate.tween (_transition_ghost_old, timing, { x: currentWidth+_transition_span-_transition_offset }).ease(ghostEase).delay(delay);	
-					Actuate.tween (_transition_ghost_old, timing/2+0.1, { alpha:0 }).ease(ghostEase).delay(timing/2+delay);
+					Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
 				}
 				Actuate.tween (_transition_ghost_new, timing, { x: sceneX-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 		}
