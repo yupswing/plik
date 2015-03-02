@@ -38,6 +38,9 @@ class Akifox
 		id = Data.id = appid;
 		_transition_mode = Constants.TRANSITION_NONE;
 
+		//sound init
+		Sfx.setVolume('sound',0);
+
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_IN,focus);
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_OUT,defocus);
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
@@ -124,6 +127,10 @@ class Akifox
 			_transition_ghost_old.bitmapData.dispose();
 			_transition_ghost_old = null;
 		}
+	}
+
+	public static function getScene():Screen {
+		return _currentScene;
 	}
 	
 	public static function loadScreen(newScreen:Screen,?transition:String=""):Void {
@@ -373,7 +380,44 @@ class Akifox
 		return false;
 	}
 
+	private static var _music:Sfx;
+	private static var _musicOn:Bool=false;
+	private static var _soundOn:Bool=false;
 
+	public static function setMusic(file:String) {
+		_music = new Sfx(file);
+		_music.type = "music";
+	}
+
+	public static function getMusicOn():Bool {
+		return _musicOn;
+	}
+
+	public static function getSoundOn():Bool {
+		return _soundOn;
+	}
+
+	public static function toggleMusic():Bool {
+		if(_musicOn) {
+			_musicOn = false;
+			_music.stop();
+		} else {
+			_musicOn = true;
+			_music.loop();
+		}
+		return _musicOn;
+	}
+
+	public static function toggleSound():Bool {
+		if(_soundOn) {
+			_soundOn = false;
+			Sfx.setVolume('sound',0);
+		} else {
+			_soundOn = true;
+			Sfx.setVolume('sound',1);
+		}
+		return _soundOn;
+	}
 
 
 	//##########################################################################################
@@ -382,12 +426,24 @@ class Akifox
 	//
 	//##########################################################################################
 
-	private static function toggleFullscreen() {
-	if(Lib.current.stage.displayState != StageDisplayState.FULL_SCREEN_INTERACTIVE){
-		Lib.current.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
-	}else {
-		Lib.current.stage.displayState = StageDisplayState.NORMAL;
+	public static function toggleFullscreen():Bool {
+	#if mobile
+		return true;
+	#else
+		if(Lib.current.stage.displayState != StageDisplayState.FULL_SCREEN_INTERACTIVE){
+			Lib.current.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+			return true;
+		}else {
+			Lib.current.stage.displayState = StageDisplayState.NORMAL;
+			return false;
+		}
+	#end
 	}
-}
+
+	public static function quit(){
+		#if !flash
+		Lib.exit();
+		#end
+	}
 
 }

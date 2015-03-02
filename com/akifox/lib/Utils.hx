@@ -53,5 +53,29 @@ class Utils
 		bmp.draw(cast target, matrix);
 		return bmp;
 	}
+	
+	/**
+	 * Clamps the value within the minimum and maximum values.
+	 * @param	value		The Float to evaluate.
+	 * @param	min			The minimum range.
+	 * @param	max			The maximum range.
+	 * @return	The clamped value.
+	 */
+	public static function clamp(value:Float, min:Float, max:Float):Float
+	{
+		if (max > min)
+		{
+			if (value < min) return min;
+			else if (value > max) return max;
+			else return value;
+		}
+		else
+		{
+			// Min/max swapped
+			if (value < max) return max;
+			else if (value > min) return min;
+			else return value;
+		}
+	}
 
 }

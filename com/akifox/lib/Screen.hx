@@ -20,7 +20,7 @@ import motion.Actuate;
  */
 class Screen extends Sprite
 {				
-	private var currentScale:Float = 1;
+	public var currentScale:Float = 1;
 	private var rwidth:Float = 500;
 	private var rheight:Float = 500;
 
