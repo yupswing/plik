@@ -224,14 +224,16 @@ class Akifox
 				
 				if (!modal) {
 					//trace('1. not modal destroy scene');
-					if (_holdScene!=null && newScreen!=null) {
+					//if (_holdScene!=null && newScreen!=null) {
 						//trace('1.5 not modal destroyhold');
-						destroyScene(_holdScene);
-						_holdScene==null;
-					}
+					//}
 					destroyScene(_currentScene);
 				} else {
 					//trace('1. modal hold scene');
+					if (_holdScene!=null) {
+						destroyScene(_holdScene);
+						_holdScene==null;
+					}
 					_screenContainer.removeChild(_currentScene);
 					_holdScene = _currentScene;
 				}
@@ -511,6 +513,14 @@ class Akifox
 	// OTHERS
 	//
 	//##########################################################################################
+
+	public static function getFullscreenOn():Bool {
+	#if mobile
+		return true;
+	#else
+		return Lib.current.stage.displayState != StageDisplayState.NORMAL;
+	#end
+	}
 
 	public static function toggleFullscreen():Bool {
 	#if mobile
