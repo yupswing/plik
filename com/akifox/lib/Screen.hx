@@ -88,7 +88,8 @@ class Screen extends Sprite
 	private function update():Void { }
 
 	public function resize():Void {
-
+		//Lib.application.window.width
+		//Lib.application.window.height
 		var screenWidth = Lib.current.stage.stageWidth;
 		var screenHeight = Lib.current.stage.stageHeight;
 

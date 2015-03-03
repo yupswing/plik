@@ -82,7 +82,7 @@ class Akifox
 		}
 	}
 
-	private static function pause():Void {
+	public static function pause():Void {
 		if (_currentScene==null) return;
 		if (_currentScene.pausable) {
 			if (inTransition) _currentScene.paused = true; // start() will handle it
@@ -90,7 +90,7 @@ class Akifox
 		}
 	}
 
-	private static function play():Void {
+	public static function play():Void {
 		if (_currentScene==null) return;
 			if (inTransition) _currentScene.paused = false; // start() will handle it
 			else _currentScene.play();
