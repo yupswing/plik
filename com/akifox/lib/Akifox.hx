@@ -20,6 +20,10 @@ import openfl.geom.Matrix;
 import motion.Actuate;
 import motion.easing.*;
 
+import openfl.events.TouchEvent;
+import openfl.ui.Multitouch;
+import openfl.ui.MultitouchInputMode;
+
 import com.akifox.lib.Screen;
 
 class Akifox
@@ -44,6 +48,27 @@ class Akifox
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_IN,focus);
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_OUT,defocus);
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
+
+		multitouchEnable();
+
+
+	}
+
+	public static var multitouchOn:Bool = false;
+
+	private static function multitouchEnable(){
+		multitouchOn = Multitouch.supportsTouchEvents;
+		if (multitouchOn)
+		{
+			// If so, set the input mode and hook up our event handlers
+			// TOUCH_POINT means simple touch events will be dispatched, 
+			// rather than gestures or mouse events
+			Multitouch.inputMode = MultitouchInputMode.TOUCH_POINT;
+			
+/*			Lib.current.stage.addEventListener(TouchEvent.TOUCH_BEGIN, onTouchBegin);
+			Lib.current.stage.addEventListener(TouchEvent.TOUCH_MOVE, onTouchMove);
+			Lib.current.stage.addEventListener(TouchEvent.TOUCH_END, onTouchEnd);*/
+		}
 	}
 
 	private static function keyUp(event:KeyboardEvent) {
