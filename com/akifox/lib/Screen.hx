@@ -49,24 +49,19 @@ class Screen extends Sprite
 	}
 
 	// call at the unloading
-	public function unload():Void {
-		pause();
-	}
+	public function unload():Void { }
 
 	// the screen is ready
 	public function start():Void {
+		resume();
 		if (paused) pause(); //handle the pause triggered during transitions Akifox
 	}
 
 	// the screen is stopped on an hold
-	public function holdStart():Void {
-
-	}
+	public function hold():Void { }
 
 	// the screen is ready after an hold
-	public function holdEnd():Void {
-		
-	}
+	public function resume():Void { }
 
 	public function play():Void {
 		if (!paused) return; //no double play

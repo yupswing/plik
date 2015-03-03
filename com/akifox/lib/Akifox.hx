@@ -153,7 +153,7 @@ class Akifox
 		scene.unload();
 		if (scene.numChildren != 0) {			
 			var i:Int = scene.numChildren;	
-			trace('destroy ',i);		
+			//trace('destroy ',i);		
 			do {
 				i--;
 				scene.removeChildAt(i);												
@@ -173,6 +173,12 @@ class Akifox
 
 	public static function holdScreen(?newScreen:Screen=null,?transition:String="") {
 		loadScreen(newScreen,transition,true);
+	}
+
+	public static function destroyHold(){
+		if (_holdScene==null) return;
+		destroyScene(_holdScene);
+		_holdScene==null;
 	}
 	
 	private static function loadScreen(?newScreen:Screen=null,?transition:String="",?modal:Bool=false):Void {
@@ -200,22 +206,11 @@ class Akifox
 
 			if (_currentScene != null) {
 
-				if (modal) {
-					//trace('0. modal');
-					_currentScene.holdStart();
-				}
-				else {
-					//trace('0. not modal');
-					_currentScene.pause();
-				}
-
+				_currentScene.hold();
 				
 				if (isMakeHold) {
-					trace('1. modal hold scene');
-					if (_holdScene!=null) {
-						destroyScene(_holdScene);
-						_holdScene==null;
-					}
+					//trace('1. modal hold scene');
+					destroyHold();
 					_holdScene = _currentScene;
 					_makeSceneOnHold = true;
 				}// else {
@@ -241,7 +236,7 @@ class Akifox
 			#end
 
 			if (isResume) {
-				trace('2. get hold screen');
+				//trace('2. get hold screen');
 				_currentScene = _holdScene;
 				_currentScene.resize(); //reset the x,y
 				_holdScene = null;
@@ -335,7 +330,7 @@ class Akifox
 
 	private static function sceneContinue():Void {
 		//trace('4. scene continue');
-		_currentScene.holdEnd();
+		_currentScene.resume();
 		_isSceneOnHold = false;
 	}
 
