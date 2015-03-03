@@ -74,14 +74,16 @@ class Akifox
 	}
 
 	private static function keyUp(event:KeyboardEvent) {
-		if(_currentScene==null) return;
+/*		if(_currentScene==null) return;
 		switch (event.keyCode) {
 			case Keyboard.P:
 				if(_currentScene.paused) play();
 				else pause();
 			case Keyboard.F:
 				toggleFullscreen();
-		}
+			case Keyboard.M:
+				toggleMusic();
+		}*/
 	}
 
 	public static function pause():Void {
@@ -98,9 +100,15 @@ class Akifox
 			else _currentScene.play();
 	}
 
-	private static function focus(event:Dynamic):Void { /*play();*/ }
+	private static function focus(event:Dynamic):Void {
+		if (_currentScene==null) return;
+		_currentScene.resume();
+	}
 
-	private static function defocus(event:Dynamic):Void { pause(); }
+	private static function defocus(event:Dynamic):Void { 
+		if (_currentScene==null) return;
+		_currentScene.hold();
+	}
 
 
 	//##########################################################################################
