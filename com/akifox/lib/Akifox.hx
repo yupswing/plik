@@ -47,6 +47,8 @@ class Akifox
 
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_IN,focus);
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_OUT,defocus);
+		Lib.current.stage.addEventListener(Event.ACTIVATE,focus);
+		Lib.current.stage.addEventListener(Event.DEACTIVATE,defocus);
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
 
 		multitouchEnable();
@@ -96,9 +98,9 @@ class Akifox
 			else _currentScene.play();
 	}
 
-	private static function focus(event:FocusEvent):Void { /*play();*/ }
+	private static function focus(event:Dynamic):Void { /*play();*/ }
 
-	private static function defocus(event:FocusEvent):Void { pause(); }
+	private static function defocus(event:Dynamic):Void { pause(); }
 
 
 	//##########################################################################################
