@@ -113,14 +113,14 @@ class Akifox
 	public static inline var _transition_span = 250; // distance between slides
 
 	private static var _currentScene(default, null):Screen;
+	private static var _oldScene(default, null):Screen;
 	private static var _holdScene(default, null):Screen;
 	private static var _screenContainer:DisplayObjectContainer;
 
 	public static var _transition_mode:String = ""; // USE Constants.TRANSITION_XXX
-	private static var _transition_ghost_old:Bitmap=null;
-	private static var _transition_ghost_new:Bitmap=null;
 
 	private static var _isSceneOnHold:Bool=false;
+	private static var _makeSceneOnHold:Bool=false;
 
 
 	private static var currentWidth:Float;
@@ -139,21 +139,6 @@ class Akifox
 	public static function resize():Void {
 		_currentScene.resize();
 	}
-	
-	private static function deleteGhost():Void {
-		Actuate.stop(_transition_ghost_old);
-		Actuate.stop(_transition_ghost_new);
-		if (_transition_ghost_new!=null) {
-			_screenContainer.removeChild(_transition_ghost_new);
-			_transition_ghost_new.bitmapData.dispose();
-			_transition_ghost_new = null;
-		}
-		if (_transition_ghost_old!=null) {
-			_screenContainer.removeChild(_transition_ghost_old);
-			_transition_ghost_old.bitmapData.dispose();
-			_transition_ghost_old = null;
-		}
-	}
 
 	public static function hasHoldScene():Bool {
 		return !(_holdScene==null);
@@ -164,15 +149,17 @@ class Akifox
 	}
 
 	private static function destroyScene(scene:Screen) {
+		if (scene==null) return;
+		scene.unload();
 		if (scene.numChildren != 0) {			
-			var i:Int = scene.numChildren;			
+			var i:Int = scene.numChildren;	
+			trace('destroy ',i);		
 			do {
 				i--;
 				scene.removeChildAt(i);												
 			} while (i > 0);
 		}			
-		_screenContainer.removeChild(scene);	
-		scene.unload();
+		_screenContainer.removeChild(scene);
 		scene = null;
 	}
 
@@ -189,7 +176,17 @@ class Akifox
 	}
 	
 	private static function loadScreen(?newScreen:Screen=null,?transition:String="",?modal:Bool=false):Void {
+		
+		// newScreen == null && modal = false    -->  get hold screen
+		// newScreen == screen && modal = true   -->  make hold screen
+		// newScreen == screen && modal = false  -->  change screen
+
 		if (newScreen==null) modal = false;
+
+		var isResume = (newScreen==null && modal == false);
+		var isMakeHold = (newScreen!=null && modal == true);
+
+		if (_holdScene==null && !isMakeHold) Actuate.reset();
 
 		if (_screenContainer != null) {
 
@@ -198,10 +195,11 @@ class Akifox
 			currentWidth = Lib.current.stage.stageWidth;
 			currentHeight = Lib.current.stage.stageHeight;
 
-			deleteGhost();
 			if (transition != "") _transition_mode = transition;
+			//_transition_mode = Constants.TRANSITION_NONE;
 
 			if (_currentScene != null) {
+
 				if (modal) {
 					//trace('0. modal');
 					_currentScene.holdStart();
@@ -211,38 +209,28 @@ class Akifox
 					_currentScene.pause();
 				}
 
-				if (_transition_mode != Constants.TRANSITION_NONE) {
-					_transition_ghost_old = new Bitmap(Utils.makeBitmap(_currentScene,currentWidth,currentHeight,_transition_offset,false));
-					_transition_ghost_old.smoothing = false;
-					_transition_ghost_old.alpha = 1;
-					_transition_ghost_old.visible = true;
-					_transition_ghost_old.x=-_transition_offset;
-					_transition_ghost_old.y=-_transition_offset;
-					_screenContainer.addChild(_transition_ghost_old);
-				}
-
 				
-				if (!modal) {
-					//trace('1. not modal destroy scene');
-					//if (_holdScene!=null && newScreen!=null) {
-						//trace('1.5 not modal destroyhold');
-					//}
-					destroyScene(_currentScene);
-				} else {
-					//trace('1. modal hold scene');
+				if (isMakeHold) {
+					trace('1. modal hold scene');
 					if (_holdScene!=null) {
 						destroyScene(_holdScene);
 						_holdScene==null;
 					}
-					_screenContainer.removeChild(_currentScene);
 					_holdScene = _currentScene;
-				}
+					_makeSceneOnHold = true;
+				}// else {
+					//trace('1. not modal destroy scene');
+					//if (_holdScene!=null && newScreen!=null) {
+						//trace('1.5 not modal destroyhold');
+					//}
+				//}
+				_oldScene = _currentScene;
 				_currentScene = null;
 			}
-			else{
+			//else{
 				//trace('0. NO PREVIOUS SCREEN');
 				//trace('1. NO PREVIOUS SCREEN');
-			}	
+			//}	
 			
 			#if flash
 			openfl.system.System.gc();
@@ -251,10 +239,11 @@ class Akifox
 			#elseif neko		
 			neko.vm.Gc.run(true);
 			#end
-			if (newScreen == null) {
-				//trace('2. get hold screen');
+
+			if (isResume) {
+				trace('2. get hold screen');
 				_currentScene = _holdScene;
-				_currentScene.resize();
+				_currentScene.resize(); //reset the x,y
 				_holdScene = null;
 				_isSceneOnHold = true;
 				sceneReady(); //launch manually
@@ -262,11 +251,10 @@ class Akifox
 				//trace('2. get new screen');
 				newScreen.initialize();
 				_currentScene = newScreen;
+				newScreen = null;
 				// sceneReady(); will be launch automatically by the newScreen
 			}
-			_currentScene.alpha = 0;
-			_screenContainer.addChild(_currentScene);
-			newScreen = null;
+			_screenContainer.addChild(_currentScene); //add the next screen on stage
 		}
 	}
 
@@ -279,59 +267,61 @@ class Akifox
 			return;
 		}
 
-		_transition_ghost_new = new Bitmap(Utils.makeBitmap(_currentScene,currentWidth,currentHeight,_transition_offset,true));
-		_transition_ghost_new.smoothing = false;
-		_transition_ghost_new.alpha = 1;
-		_transition_ghost_new.visible = true;
-		_transition_ghost_new.x=-_transition_offset;
-		_transition_ghost_new.y=-_transition_offset;
-		_screenContainer.addChild(_transition_ghost_new);
-
 		var timing = 1;
-		var delay = #if mobile 0.2 #else 0 #end; //ios needs bit of delay
+		var delay = 0;//#if mobile 0.2 #else 0 #end; //ios needs bit of delay
 
 		var ghostEase = Sine.easeIn;
 		var sceneEase = Expo.easeOut;
 
+		_currentScene.alpha = 1; //reset the alpha
+
+		var baseX = _currentScene.x;
+		var baseY = _currentScene.y;
+		var oldX = _oldScene.x;
+		var oldY = _oldScene.y;
+
 		switch (_transition_mode) {
 			case Constants.TRANSITION_ALPHA:
-				_transition_ghost_new.alpha = 0;
-				if (_transition_ghost_old!=null) Actuate.tween (_transition_ghost_old, timing, { alpha: 0 }).delay(delay);
-				Actuate.tween (_transition_ghost_new, timing, { alpha: 1 }).delay(delay).onComplete(sceneStart);
+				_currentScene.alpha = 0;
+				if (_oldScene!=null) Actuate.tween (_oldScene, timing, { alpha: 0 }).delay(delay);
+				Actuate.tween (_currentScene, timing, { alpha: 1 }).delay(delay).onComplete(sceneStart);
 			case Constants.TRANSITION_SLIDE_UP:
-				_transition_ghost_new.y += currentHeight+_transition_span;
-				if (_transition_ghost_old!=null) {
-						Actuate.tween (_transition_ghost_old, timing, { y: -currentHeight-_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
-						Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
-					}
-				Actuate.tween (_transition_ghost_new, timing, { y: -_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				_currentScene.y += currentHeight+_transition_span;
+				if (_oldScene!=null) {
+					Actuate.tween (_oldScene, timing, { y: oldY-currentHeight-_transition_span }).ease(ghostEase).delay(delay);
+					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
+				}
+				Actuate.tween (_currentScene, timing, { y: baseY }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 			case Constants.TRANSITION_SLIDE_DOWN:
-				_transition_ghost_new.y -= currentHeight+_transition_span;
-				if (_transition_ghost_old!=null) {
-					Actuate.tween (_transition_ghost_old, timing, { y: currentHeight+_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
-					Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
+				_currentScene.y -= currentHeight+_transition_span;
+				if (_oldScene!=null) {
+					Actuate.tween (_oldScene, timing, { y: oldY+currentHeight+_transition_span }).ease(ghostEase).delay(delay);
+					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
 				}
-				Actuate.tween (_transition_ghost_new, timing, { y: -_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_currentScene, timing, { y: baseY }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 			case Constants.TRANSITION_SLIDE_LEFT:
-				_transition_ghost_new.x += currentWidth+_transition_span;
-				if (_transition_ghost_old!=null) {
-					Actuate.tween (_transition_ghost_old, timing, { x: -currentWidth-_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
-					Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
+				_currentScene.x += currentWidth+_transition_span;
+				if (_oldScene!=null) {
+					Actuate.tween (_oldScene, timing, { x: oldX-currentWidth-_transition_span }).ease(ghostEase).delay(delay);
+					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
 				}
-				Actuate.tween (_transition_ghost_new, timing, { x: -_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_currentScene, timing, { x: baseX }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 			case Constants.TRANSITION_SLIDE_RIGHT:
-				_transition_ghost_new.x -= currentWidth+_transition_span;
-				if (_transition_ghost_old!=null) {
-					Actuate.tween (_transition_ghost_old, timing, { x: currentWidth+_transition_span-_transition_offset }).ease(ghostEase).delay(delay);	
-					Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
+				_currentScene.x -= currentWidth+_transition_span;
+				if (_oldScene!=null) {
+					Actuate.tween (_oldScene, timing, { x: oldX+currentWidth+_transition_span }).ease(ghostEase).delay(delay);	
+					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
 				}
-				Actuate.tween (_transition_ghost_new, timing, { x: -_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_currentScene, timing, { x: baseX }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 		}
 	}
 
 	private static function sceneStart():Void {
-		deleteGhost();
-		_currentScene.alpha = 1;
+		if (_makeSceneOnHold) {
+			_oldScene = null;
+		}else{
+			destroyScene(_oldScene);
+		}
 		inTransition = false;
 
 		if (_isSceneOnHold) {
@@ -340,6 +330,7 @@ class Akifox
 		}
 		//trace('4. scene start');
 		_currentScene.start();
+		_makeSceneOnHold = false;
 	}
 
 	private static function sceneContinue():Void {
