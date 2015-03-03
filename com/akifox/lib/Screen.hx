@@ -44,7 +44,7 @@ class Screen extends Sprite
 	public function construct(event:Event) {
 		removeEventListener(Event.ADDED_TO_STAGE, construct);
 
-		resize(Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
+		resize();
 		Akifox.sceneReady();
 	}
 
@@ -58,14 +58,25 @@ class Screen extends Sprite
 		if (paused) pause(); //handle the pause triggered during transitions Akifox
 	}
 
+	// the screen is stopped on an hold
+	public function holdStart():Void {
+
+	}
+
+	// the screen is ready after an hold
+	public function holdEnd():Void {
+		
+	}
+
 	public function play():Void {
-		if (!paused) return; //not double listeners
+		if (!paused) return; //no double play
 		paused = false;
 		if (cycle) Lib.current.stage.addEventListener(Event.ENTER_FRAME, onUpdate);
 		Actuate.resumeAll();
 	}
 
 	public function pause():Void {
+		if (paused) return; //no double pause
 		if (cycle) Lib.current.stage.removeEventListener(Event.ENTER_FRAME, onUpdate);
 		Actuate.pauseAll();
 		paused = true;
@@ -76,8 +87,10 @@ class Screen extends Sprite
 	}
 	private function update():Void { }
 
-	public function resize(screenWidth:Int,screenHeight:Int):Void {
+	public function resize():Void {
 
+		var screenWidth = Lib.current.stage.stageWidth;
+		var screenHeight = Lib.current.stage.stageHeight;
 
 		// leave margins
 		var maxWidth = screenWidth * 1.05;

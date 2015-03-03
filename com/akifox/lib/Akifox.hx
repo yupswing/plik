@@ -87,7 +87,6 @@ class Akifox
 		if (_currentScene.pausable) {
 			if (inTransition) _currentScene.paused = true; // start() will handle it
 			else _currentScene.pause();
-			//trace(_currentScene.paused);
 		}
 	}
 
@@ -95,10 +94,9 @@ class Akifox
 		if (_currentScene==null) return;
 			if (inTransition) _currentScene.paused = false; // start() will handle it
 			else _currentScene.play();
-			//trace(_currentScene.paused);
 	}
 
-	private static function focus(event:FocusEvent):Void { play(); }
+	private static function focus(event:FocusEvent):Void { /*play();*/ }
 
 	private static function defocus(event:FocusEvent):Void { pause(); }
 
@@ -113,17 +111,18 @@ class Akifox
 	public static inline var _transition_span = 250; // distance between slides
 
 	private static var _currentScene(default, null):Screen;
+	private static var _holdScene(default, null):Screen;
 	private static var _screenContainer:DisplayObjectContainer;
 
 	public static var _transition_mode:String = ""; // USE Constants.TRANSITION_XXX
-	private static var _transition_ghost_old:Bitmap;
-	private static var _transition_ghost_new:Bitmap;
+	private static var _transition_ghost_old:Bitmap=null;
+	private static var _transition_ghost_new:Bitmap=null;
+
+	private static var _isSceneOnHold:Bool=false;
 
 
 	private static var currentWidth:Float;
 	private static var currentHeight:Float;
-	private static var sceneX:Float;
-	private static var sceneY:Float;
 	
 /*	private static var previousTime:Int = 0;	
 	public static function update():Void {
@@ -135,8 +134,8 @@ class Akifox
 		previousTime = currentTime;
 	}*/
 
-	public static function resize(screenWidth:Int,screenHeight:Int):Void {
-		_currentScene.resize(screenWidth,screenHeight);
+	public static function resize():Void {
+		_currentScene.resize();
 	}
 	
 	private static function deleteGhost():Void {
@@ -154,12 +153,41 @@ class Akifox
 		}
 	}
 
+	public static function hasHoldScene():Bool {
+		return !(_holdScene==null);
+	}
+
 	public static function getScene():Screen {
 		return _currentScene;
 	}
+
+	private static function destroyScene(scene:Screen) {
+		if (scene.numChildren != 0) {			
+			var i:Int = scene.numChildren;			
+			do {
+				i--;
+				scene.removeChildAt(i);												
+			} while (i > 0);
+		}			
+		_screenContainer.removeChild(scene);	
+		scene.unload();
+		scene = null;
+	}
+
+	public static function changeScreen(?newScreen:Screen=null,?transition:String="") {
+		loadScreen(newScreen,transition,false);
+	}
+
+	public static function resumeScreen(?transition:String="") {
+		loadScreen(null,transition,false);
+	}
+
+	public static function holdScreen(?newScreen:Screen=null,?transition:String="") {
+		loadScreen(newScreen,transition,true);
+	}
 	
-	public static function loadScreen(newScreen:Screen,?transition:String=""):Void {
-		//trace('load');
+	private static function loadScreen(?newScreen:Screen=null,?transition:String="",?modal:Bool=false):Void {
+		if (newScreen==null) modal = false;
 
 		if (_screenContainer != null) {
 
@@ -172,7 +200,14 @@ class Akifox
 			if (transition != "") _transition_mode = transition;
 
 			if (_currentScene != null) {
-				Actuate.stop(_currentScene);
+				if (modal) {
+					//trace('0. modal');
+					_currentScene.holdStart();
+				}
+				else {
+					//trace('0. not modal');
+					_currentScene.pause();
+				}
 
 				if (_transition_mode != Constants.TRANSITION_NONE) {
 					_transition_ghost_old = new Bitmap(Utils.makeBitmap(_currentScene,currentWidth,currentHeight,_transition_offset,false));
@@ -184,19 +219,26 @@ class Akifox
 					_screenContainer.addChild(_transition_ghost_old);
 				}
 
-				_screenContainer.removeChild(_currentScene);
 				
-				if (_currentScene.numChildren != 0) {			
-					var i:Int = _currentScene.numChildren;			
-					do {
-						i--;
-						_currentScene.removeChildAt(i);												
-					} while (i > 0);
-				}				
-				
-				_currentScene.unload();
+				if (!modal) {
+					//trace('1. not modal destroy scene');
+					if (_holdScene!=null && newScreen!=null) {
+						//trace('1.5 not modal destroyhold');
+						destroyScene(_holdScene);
+						_holdScene==null;
+					}
+					destroyScene(_currentScene);
+				} else {
+					//trace('1. modal hold scene');
+					_screenContainer.removeChild(_currentScene);
+					_holdScene = _currentScene;
+				}
 				_currentScene = null;
-			}		
+			}
+			else{
+				//trace('0. NO PREVIOUS SCREEN');
+				//trace('1. NO PREVIOUS SCREEN');
+			}	
 			
 			#if flash
 			openfl.system.System.gc();
@@ -205,22 +247,28 @@ class Akifox
 			#elseif neko		
 			neko.vm.Gc.run(true);
 			#end
-			
-			newScreen.initialize();
-			_currentScene = newScreen;
+			if (newScreen == null) {
+				//trace('2. get hold screen');
+				_currentScene = _holdScene;
+				_currentScene.resize();
+				_holdScene = null;
+				_isSceneOnHold = true;
+				sceneReady(); //launch manually
+			} else {
+				//trace('2. get new screen');
+				newScreen.initialize();
+				_currentScene = newScreen;
+				// sceneReady(); will be launch automatically by the newScreen
+			}
 			_currentScene.alpha = 0;
-
-			sceneX = _currentScene.x;
-			sceneY = _currentScene.y;
-
 			_screenContainer.addChild(_currentScene);
+			newScreen = null;
 		}
-		//trace('loaded');
 	}
 
 
 	public static function sceneReady():Void {
-		//trace('ready');
+		//trace('3. scene ready');
 
 		if (_transition_mode == Constants.TRANSITION_NONE) {
 			sceneStart();
@@ -252,37 +300,48 @@ class Akifox
 						Actuate.tween (_transition_ghost_old, timing, { y: -currentHeight-_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
 						Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
 					}
-				Actuate.tween (_transition_ghost_new, timing, { y: sceneY-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_transition_ghost_new, timing, { y: -_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 			case Constants.TRANSITION_SLIDE_DOWN:
 				_transition_ghost_new.y -= currentHeight+_transition_span;
 				if (_transition_ghost_old!=null) {
 					Actuate.tween (_transition_ghost_old, timing, { y: currentHeight+_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
 					Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
 				}
-				Actuate.tween (_transition_ghost_new, timing, { y: sceneY-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_transition_ghost_new, timing, { y: -_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 			case Constants.TRANSITION_SLIDE_LEFT:
 				_transition_ghost_new.x += currentWidth+_transition_span;
 				if (_transition_ghost_old!=null) {
 					Actuate.tween (_transition_ghost_old, timing, { x: -currentWidth-_transition_span-_transition_offset }).ease(ghostEase).delay(delay);
 					Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
 				}
-				Actuate.tween (_transition_ghost_new, timing, { x: sceneX-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_transition_ghost_new, timing, { x: -_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 			case Constants.TRANSITION_SLIDE_RIGHT:
 				_transition_ghost_new.x -= currentWidth+_transition_span;
 				if (_transition_ghost_old!=null) {
 					Actuate.tween (_transition_ghost_old, timing, { x: currentWidth+_transition_span-_transition_offset }).ease(ghostEase).delay(delay);	
 					Actuate.tween (_transition_ghost_old, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
 				}
-				Actuate.tween (_transition_ghost_new, timing, { x: sceneX-_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_transition_ghost_new, timing, { x: -_transition_offset }).ease(sceneEase).delay(delay).onComplete(sceneStart);
 		}
 	}
 
-	private static function sceneStart():Void{
+	private static function sceneStart():Void {
 		deleteGhost();
 		_currentScene.alpha = 1;
-		//trace('start');
 		inTransition = false;
+
+		if (_isSceneOnHold) {
+			sceneContinue();
+			return;
+		}
+		//trace('4. scene start');
 		_currentScene.start();
+	}
+
+	private static function sceneContinue():Void {
+		//trace('4. scene continue');
+		_currentScene.holdEnd();
+		_isSceneOnHold = false;
 	}
 
 
