@@ -5,6 +5,7 @@ import openfl.display.BitmapData;
 import openfl.display.DisplayObject;
 import openfl.geom.Rectangle;
 import openfl.geom.Matrix;
+import openfl.net.URLRequest;
 
 class Utils
 {
@@ -77,5 +78,11 @@ class Utils
 			else return value;
 		}
 	}
+
+    public static function gotoWebsite(website:String):Void 
+    {
+        // open an url
+        Lib.getURL(new URLRequest (website));
+    }
 
 }
