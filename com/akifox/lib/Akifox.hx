@@ -49,7 +49,9 @@ class Akifox
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_OUT,defocus);
 		Lib.current.stage.addEventListener(Event.ACTIVATE,focus);
 		Lib.current.stage.addEventListener(Event.DEACTIVATE,defocus);
+		#if !mobile
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
+		#end
 
 		multitouchEnable();
 
@@ -66,10 +68,6 @@ class Akifox
 			// TOUCH_POINT means simple touch events will be dispatched, 
 			// rather than gestures or mouse events
 			Multitouch.inputMode = MultitouchInputMode.TOUCH_POINT;
-			
-/*			Lib.current.stage.addEventListener(TouchEvent.TOUCH_BEGIN, onTouchBegin);
-			Lib.current.stage.addEventListener(TouchEvent.TOUCH_MOVE, onTouchMove);
-			Lib.current.stage.addEventListener(TouchEvent.TOUCH_END, onTouchEnd);*/
 		}
 	}
 
@@ -280,8 +278,12 @@ class Akifox
 
 		var baseX = _currentScene.x;
 		var baseY = _currentScene.y;
-		var oldX = _oldScene.x;
-		var oldY = _oldScene.y;
+		var oldX:Float = 0;
+		var oldY:Float = 0;
+		if (_oldScene != null) {
+			oldX = _oldScene.x;
+			oldY = _oldScene.y;
+		}
 
 		switch (_transition_mode) {
 			case Constants.TRANSITION_ALPHA:
