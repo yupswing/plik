@@ -39,7 +39,7 @@ class Akifox
 		} else {
 			throw new Error("AKIFOX Error: Cannot initialize screen container. The value is null.");
 		}
-		id = Data.id = appid;
+		id = appid;
 		_transition_mode = Constants.TRANSITION_NONE;
 
 		//sound init
@@ -148,6 +148,10 @@ class Akifox
 
 	public static function hasHoldScene():Bool {
 		return !(_holdScene==null);
+	}
+
+	public static function getHoldScene():Dynamic {
+		return _holdScene;
 	}
 
 	public static function getScene():Screen {
@@ -489,6 +493,8 @@ class Akifox
 			_musicOn = true;
 			_music.loop();
 		}
+		setPref('music',_musicOn);
+		savePref();
 		return _musicOn;
 	}
 
@@ -500,9 +506,70 @@ class Akifox
 			_soundOn = true;
 			Sfx.setVolume('sound',1);
 		}
+		setPref('sound',_soundOn);
+		savePref();
 		return _soundOn;
 	}
 
+
+	//##########################################################################################
+	//
+	// PREFERENCES
+	//
+	//##########################################################################################
+
+	private static var prefData:Data;
+	private static var prefFields:Map<String,Array<Dynamic>>=null;
+
+	public static function setPrefField(name:String,type:String,defaultValue:Dynamic){
+		if (prefFields == null) return;
+		prefFields[name] = [type,defaultValue];
+	}
+
+	public static function loadPref() {
+		// load pref
+		prefData = new Data("pref");
+
+		// set base pref fields
+		prefFields = new Map<String,Array<Dynamic>>();
+		setPrefField('music','bool',true);
+		setPrefField('sound','bool',true);
+		setPrefField('fullscreen','bool',false);
+
+		// toggle base pref
+		if (getPref('music')) toggleMusic();
+		if (getPref('sound')) toggleSound();
+		if (getPref('fullscreen')) toggleFullscreen();
+	}
+
+	public static function savePref() {
+		prefData.save();
+	}
+
+
+	//standard are 'music' 'sound' 'fullscreen'
+	public static function getPref(name:String):Dynamic {
+		var type = 'dynamic';
+		var defaultValue = null;
+		if (prefFields.exists(name)) {
+			type = prefFields[name][0];
+			defaultValue = prefFields[name][1];
+		}
+
+		switch (type) {
+			case 'string':
+				return prefData.readString(name,cast(defaultValue,String));
+			case 'int':
+				return prefData.readInt(name,cast(defaultValue,Int));
+			case 'bool':
+				return prefData.readBool(name,cast(defaultValue,Bool));
+		}
+		return prefData.read(name,defaultValue);
+	}
+
+	public static function setPref(name:String,value:Dynamic) {
+		prefData.write(name,value);
+	}
 
 	//##########################################################################################
 	//
@@ -519,17 +586,21 @@ class Akifox
 	}
 
 	public static function toggleFullscreen():Bool {
+	var _fullscreenOn = false;
 	#if mobile
-		return true;
+		_fullscreenOn = true;
 	#else
 		if(Lib.current.stage.displayState != StageDisplayState.FULL_SCREEN_INTERACTIVE){
 			Lib.current.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
-			return true;
+			_fullscreenOn = true;
 		}else {
 			Lib.current.stage.displayState = StageDisplayState.NORMAL;
-			return false;
+			_fullscreenOn = false;
 		}
 	#end
+	setPref('fullscreen',_fullscreenOn);
+	savePref();
+	return _fullscreenOn;
 	}
 
 	public static function quit(){

@@ -12,15 +12,22 @@ class Data
 	/**
 	 * If you want to share data between different SWFs on the same host, use this id.
 	 */
-	public static var id:String = "";
+	private var id:String = "";
+	private var file:String = "";
+
+	public function new(file:String="",?id:String="") {
+		this.id = id;
+		this.file = file;
+		load();
+	}
 
 	/**
 	 * Overwrites the current data with the file.
 	 * @param	file		The filename to load.
 	 */
-	public static function load(file:String = "")
+	public function load()
 	{
-		var data:Dynamic = loadData(file);
+		var data:Dynamic = loadData();
 		_data = new Map<String,Dynamic>();
 		for (str in Reflect.fields(data)) _data.set(str, Reflect.field(data, str));
 	}
@@ -30,10 +37,10 @@ class Data
 	 * @param	file		The filename to save.
 	 * @param	overwrite	Clear the file before saving.
 	 */
-	public static function save(file:String = "", overwrite:Bool = true)
+	public function save(overwrite:Bool = true)
 	{
 		if (_shared != null) _shared.clear();
-		var data:Dynamic = loadData(file);
+		var data:Dynamic = loadData();
 		var str:String;
 		if (overwrite)
 			for (str in Reflect.fields(data)) Reflect.deleteField(data, str);
@@ -52,7 +59,7 @@ class Data
 	 * @param	defaultValue	Default value.
 	 * @return	The property value, or defaultValue if the property is not assigned.
 	 */
-	public static function readInt(name:String, defaultValue:Int = 0):Int
+	public function readInt(name:String, defaultValue:Int = 0):Int
 	{
 		return Std.int(read(name, defaultValue));
 	}
@@ -63,7 +70,7 @@ class Data
 	 * @param	defaultValue	Default value.
 	 * @return	The property value, or defaultValue if the property is not assigned.
 	 */
-	public static function readBool(name:String, defaultValue:Bool = true):Bool
+	public function readBool(name:String, defaultValue:Bool = true):Bool
 	{
 		return read(name, defaultValue);
 	}
@@ -74,7 +81,7 @@ class Data
 	 * @param	defaultValue	Default value.
 	 * @return	The property value, or defaultValue if the property is not assigned.
 	 */
-	public static function readString(name:String, defaultValue:String = ""):String
+	public function readString(name:String, defaultValue:String = ""):String
 	{
 		return Std.string(read(name, defaultValue));
 	}
@@ -85,7 +92,7 @@ class Data
 	 * @param	defaultValue	Default value.
 	 * @return	The property value, or defaultValue if the property is not assigned.
 	 */
-	public static function read(name:String, defaultValue:Dynamic = null):Dynamic
+	public function read(name:String, defaultValue:Dynamic = null):Dynamic
 	{
 		if (_data.get(name) != null) return _data.get(name);
 		return defaultValue;
@@ -96,13 +103,13 @@ class Data
 	 * @param	name		Property to write.
 	 * @param	value		Value to write.
 	 */
-	public static function write(name:String, value:Dynamic)
+	public function write(name:String, value:Dynamic)
 	{
 		_data.set(name, value);
 	}
 
 	/** @private Loads the data file, or return it if you're loading the same one. */
-	private static function loadData(file:String):Dynamic
+	private function loadData():Dynamic
 	{
 		if (file == null) file = DEFAULT_FILE;
 		if (id != "") _shared = SharedObject.getLocal(PREFIX + "/" + id + "/" + file, "/");
@@ -111,9 +118,8 @@ class Data
 	}
 
 	// Data information.
-	private static var _shared:SharedObject;
-	private static var _dir:String;
-	private static var _data:Map<String,Dynamic> = new Map<String,Dynamic>();
+	private var _shared:SharedObject;
+	private var _data:Map<String,Dynamic> = new Map<String,Dynamic>();
 	private static inline var PREFIX:String = "Akifox";
 	private static inline var DEFAULT_FILE:String = "_default";
 	private static inline var SIZE:Int = 10000;
