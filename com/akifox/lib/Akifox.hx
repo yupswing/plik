@@ -519,11 +519,12 @@ class Akifox
 	//##########################################################################################
 
 	private static var prefData:Data;
-	private static var prefFields:Map<String,Array<Dynamic>>=null;
+	private static var prefFields:Map<String,String>=null;
 
 	public static function setPrefField(name:String,type:String,defaultValue:Dynamic){
 		if (prefFields == null) return;
-		prefFields[name] = [type,defaultValue];
+		prefFields[name] = type;
+		setPref(name,getPref(name,defaultValue));
 	}
 
 	public static function loadPref() {
@@ -531,7 +532,7 @@ class Akifox
 		prefData = new Data("pref");
 
 		// set base pref fields
-		prefFields = new Map<String,Array<Dynamic>>();
+		prefFields = new Map<String,String>();
 		setPrefField('music','bool',true);
 		setPrefField('sound','bool',true);
 		setPrefField('fullscreen','bool',false);
@@ -548,21 +549,19 @@ class Akifox
 
 
 	//standard are 'music' 'sound' 'fullscreen'
-	public static function getPref(name:String):Dynamic {
+	public static function getPref(name:String,?defaultValue:Dynamic=null):Dynamic {
 		var type = 'dynamic';
-		var defaultValue = null;
 		if (prefFields.exists(name)) {
-			type = prefFields[name][0];
-			defaultValue = prefFields[name][1];
+			type = prefFields[name];
 		}
 
 		switch (type) {
 			case 'string':
-				return prefData.readString(name,cast(defaultValue,String));
+				return prefData.readString(name,defaultValue);
 			case 'int':
-				return prefData.readInt(name,cast(defaultValue,Int));
+				return prefData.readInt(name,defaultValue);
 			case 'bool':
-				return prefData.readBool(name,cast(defaultValue,Bool));
+				return prefData.readBool(name,defaultValue);
 		}
 		return prefData.read(name,defaultValue);
 	}
