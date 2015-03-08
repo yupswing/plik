@@ -9,3 +9,15 @@ Haxe/OpenFL class to display FPS stats and memory usage.
 [Check the class here](com/akifox/lib/debug)
 
 ![Screenshot](https://dl.dropboxusercontent.com/u/683344/akifox/akifox-lib/performance-screenshot.png)
+
+
+#### com.akifox.lib.atlas.*
+Haxe/OpenFL classes to manage Texture Atlas
+
+[Check the class here](com/akifox/lib/atlas)
+
+
+#### com.akifox.lib.atlas.*
+Haxe/OpenFL classes to manage Texture Atlas
+
+[Check the class here](com/akifox/lib/atlas)

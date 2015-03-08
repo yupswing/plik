@@ -11,7 +11,7 @@ import openfl.display.DisplayObject;
 
 @author Simone Cingano (yupswing) [Akifox Studio](http://akifox.com)
 
-@version 1.0.2dev
+@version 2.0
 [Public repository](https://github.com/yupswing/akifox-transform/)
 
 #### Transformation HAXE/OpenFL Library
@@ -25,10 +25,6 @@ http://www.senocular.com/flash/tutorials/transformmatrix/
 */
 class Transformation extends EventDispatcher
 {
-	/** Constant factor to pass from degrees to radians **/
-    public static var DEG2RAD:Float = Math.PI/180;
-	/** Constant factor to pass from radians to degrees **/
-    public static var RAD2DEG:Float = 180/Math.PI;
 
     // Pivot Point Anchors (used by setAnchoredPivot and getAnchoredPivot)
     public inline static var ANCHOR_TOP_LEFT:Int = 0;
@@ -59,6 +55,9 @@ class Transformation extends EventDispatcher
 
 	/** The debug sprite where debugDraw() draws **/
     public var spriteDebug:Sprite;
+
+    // THE MATRIX!
+    private var matrix:Matrix;
 
 	/** 
 	* Class instance
@@ -101,7 +100,7 @@ class Transformation extends EventDispatcher
 
 		// get current translation and the complete matrix
     	var translation:Point = getTranslation();
-    	var currentMatrix:Matrix = getMatrix();
+    	var currentMatrix:Matrix = getMatrixInternal();
 
     	// remove all transformation
     	this.identity();
@@ -396,7 +395,7 @@ class Transformation extends EventDispatcher
     	// adjust==true is needed to respect the Pivot Point
     	var originalPoint:Point = new Point(0,0);
     	if (adjust) originalPoint = getPivot();  //this before apply the transform
-        target.transform.matrix = m; 			 //apply the transformation
+        target.transform.matrix = m.clone(); 	 //apply the transformation
         if (adjust) adjustOffset(originalPoint); //this after apply the transform
         this.onTransform();
     }
@@ -425,6 +424,16 @@ class Transformation extends EventDispatcher
     	// update the matrix and adjust to respect the Pivot Point
     	setMatrixInternal(m,true);
     }
+    private function getMatrixInternal():Matrix
+    {
+    	Akifox.matrix.setTo(target.transform.matrix.a,
+    					    target.transform.matrix.b,
+    					    target.transform.matrix.c,
+    					    target.transform.matrix.d,
+    					    target.transform.matrix.tx,
+    					    target.transform.matrix.ty);
+    	return Akifox.matrix;
+    }
 
 	/** 
 	* Get a copy of the current transformation matrix
@@ -433,9 +442,8 @@ class Transformation extends EventDispatcher
 	**/
     public function getMatrix():Matrix
     {
-        return target.transform.matrix.clone();
+    	return target.transform.matrix.clone();
     }
-
 
 	// #########################################################################
 
@@ -443,7 +451,7 @@ class Transformation extends EventDispatcher
 	private function adjustOffset(originalPoint:Point) {
 
         //get the target matrix to apply the transformation
-	    var m:Matrix = getMatrix();
+	    var m:Matrix = getMatrixInternal();
 
 		//get the pivot NEW absolute position
         var transformedPoint:Point = m.transformPoint(offsetPoint);
@@ -503,7 +511,7 @@ class Transformation extends EventDispatcher
     public function inverseTransformPoint(point:Point):Point {
         // remove the current transformation on a point
         // (give a transformed point to get a 'identity' point)
-    	var m:Matrix = getMatrix();
+    	var m:Matrix = getMatrixInternal();
     	m.invert();
         return m.transformPoint(point);
     }
@@ -523,7 +531,7 @@ class Transformation extends EventDispatcher
         // remove the current transformation on a point
         // (give a transformed point to get a 'identity' point)
         // [ignore the translation]
-    	var m:Matrix = getMatrix();
+    	var m:Matrix = getMatrixInternal();
     	m.invert();
         return m.deltaTransformPoint(point);
     }
@@ -558,7 +566,7 @@ class Transformation extends EventDispatcher
 	**/
 	public function translate(dx:Float=0, dy:Float=0):Void
 	{
-	    var m:Matrix = getMatrix();
+	    var m:Matrix = getMatrixInternal();
 	    m.tx += dx;
 	    m.ty += dy;
 	    setMatrixInternal(m);
@@ -582,7 +590,7 @@ class Transformation extends EventDispatcher
 	**/
 	public function setTranslation(translation:Point):Void
 	{
-	    var m:Matrix = getMatrix();
+	    var m:Matrix = getMatrixInternal();
 	    var transformedOffset:Point = deltaTransformPoint(offsetPoint);
 	    m.tx = translation.x-transformedOffset.x;
 	    m.ty = translation.y-transformedOffset.y;
@@ -593,7 +601,7 @@ class Transformation extends EventDispatcher
 	* @param tx The X coordinate
 	**/
 	public function setTranslationX(tx:Float=0):Float {
-	    var m:Matrix = getMatrix();
+	    var m:Matrix = getMatrixInternal();
 	    m.tx = tx-deltaTransformPoint(offsetPoint).x;
 	    setMatrixInternal(m);
 	    return tx;
@@ -603,7 +611,7 @@ class Transformation extends EventDispatcher
 	* @param ty The Y coordinate
 	**/
 	public function setTranslationY(ty:Float=0):Float {
-	    var m:Matrix = getMatrix();
+	    var m:Matrix = getMatrixInternal();
 	    m.ty = ty-deltaTransformPoint(offsetPoint).y;
 	    setMatrixInternal(m);
 	    return ty;
@@ -698,7 +706,7 @@ class Transformation extends EventDispatcher
 	{
 
         //get the target matrix to apply the transformation
-	    var m:Matrix = getMatrix();
+	    var m:Matrix = getMatrixInternal();
 
 		// apply the skew (matrix.c is HORIZONTAL, matrix.b is VERTICAL)
 	    if (skewXRad!=-0.1) {
@@ -727,8 +735,8 @@ class Transformation extends EventDispatcher
 		// check null to avoid error on multiplication
 		var skewXRad:Float=-0.1;
 		var skewYRad:Float=-0.1;
-		if (skewXDeg!=-0.1) skewXRad = skewXDeg*DEG2RAD;
-		if (skewYDeg!=-0.1) skewYRad = skewYDeg*DEG2RAD;
+		if (skewXDeg!=-0.1) skewXRad = skewXDeg*Akifox.DEG2RAD;
+		if (skewYDeg!=-0.1) skewYRad = skewYDeg*Akifox.DEG2RAD;
 		setSkewRad(skewXRad,skewYRad);
 	}
 
@@ -795,7 +803,7 @@ class Transformation extends EventDispatcher
 	    }
 	    
 		//apply the matrix to the target
-	    m.concat(getMatrix());
+	    m.concat(getMatrixInternal());
 	    setMatrixInternal(m,true);
 	}
 
@@ -812,7 +820,7 @@ class Transformation extends EventDispatcher
 		var skewXDeg:Float = skewDeg;
 		// if not specified it will set the x and y skew using the same value
 		if (skewYDeg==-0.1) skewYDeg = skewDeg;
-		skewRad(skewXDeg*DEG2RAD,skewYDeg*DEG2RAD);
+		skewRad(skewXDeg*Akifox.DEG2RAD,skewYDeg*Akifox.DEG2RAD);
 	}
 
 	/** 
@@ -850,9 +858,9 @@ class Transformation extends EventDispatcher
 	**/
     public function getSkewXRad():Float
     {
-    	var px = new Point(0, 1);
-		px = deltaTransformPoint(px);
-		return -(Math.atan2(px.y, px.x) - Math.PI/2);
+		Akifox.point.x = 0; Akifox.point.y = 1;
+		Akifox.point = deltaTransformPoint(Akifox.point);
+		return -(Math.atan2(Akifox.point.y, Akifox.point.x) - Math.PI/2);
     }
 
    	/** 
@@ -862,9 +870,9 @@ class Transformation extends EventDispatcher
 	**/
 	public function getSkewYRad():Float
 	{
-		var py = new Point(1, 0);
-		py = deltaTransformPoint(py);
-		return Math.atan2(py.y, py.x);
+		Akifox.point.x = 1; Akifox.point.y = 0;
+		Akifox.point = deltaTransformPoint(Akifox.point);
+		return Math.atan2(Akifox.point.y, Akifox.point.x);
 	} 
 
    	/** 
@@ -872,14 +880,14 @@ class Transformation extends EventDispatcher
 	* 
 	* @returns the current skew on the X Axis in Degrees
 	**/
-    public function getSkewX():Float { return getSkewXRad()*RAD2DEG; }
+    public function getSkewX():Float { return getSkewXRad()*Akifox.Akifox.RAD2DEG; }
 
    	/** 
 	* **NOTE:** Could not be reliable if the scale is not uniform
 	* 
 	* @returns the current skew on the Y Axis in Degrees
 	**/
-	public function getSkewY():Float { return getSkewYRad()*RAD2DEG; }
+	public function getSkewY():Float { return getSkewYRad()*Akifox.Akifox.RAD2DEG; }
 
 	/** Use getSkewX and setSkewX **/
 	public var skewingX(get, set):Float;
@@ -924,7 +932,7 @@ class Transformation extends EventDispatcher
 	    // (keep this BEFORE applying the new matrix to the target)
 
         //get the target matrix to apply the transformation
-	    var m:Matrix = getMatrix();
+	    var m:Matrix = getMatrixInternal();
 
 		// apply the scaling
 		m.a *= xFactor;
@@ -981,7 +989,7 @@ class Transformation extends EventDispatcher
 	**/
 	public function setScaleX(scaleX:Float):Float
 	{
-        var m:Matrix = getMatrix();
+        var m:Matrix = getMatrixInternal();
 		var oldValue:Float = getScaleX();
 		// avoid division by zero 
 		if (oldValue!=0)
@@ -1007,7 +1015,7 @@ class Transformation extends EventDispatcher
 	**/
 	public function setScaleY(scaleY:Float):Float
 	{
-        var m:Matrix = getMatrix();
+        var m:Matrix = getMatrixInternal();
 		var oldValue:Float = getScaleY();
 		// avoid division by zero 
 		if (oldValue!=0)
@@ -1083,7 +1091,7 @@ class Transformation extends EventDispatcher
         var absolutePoint:Point = getPivot();
 
         //get the target matrix to apply the transformation
-	    var m:Matrix = getMatrix();
+	    var m:Matrix = getMatrixInternal();
 
 	    //move the target(matrix)
 	    //the pivot point will match the origin (0,0)
@@ -1120,7 +1128,7 @@ class Transformation extends EventDispatcher
 	*
 	* @param angle The angle in Degrees 
 	**/
-	public function rotate(angle:Float):Void { rotateRad(angle*DEG2RAD); }
+	public function rotate(angle:Float):Void { rotateRad(angle*Akifox.DEG2RAD); }
 
 	/** 
 	* Set the rotation on a given value
@@ -1149,7 +1157,7 @@ class Transformation extends EventDispatcher
 	*
 	* @param angle The absolute angle in Degrees
 	**/
-	public function setRotation(angle:Float):Float { return setRotationRad(angle*DEG2RAD); }
+	public function setRotation(angle:Float):Float { return setRotationRad(angle*Akifox.DEG2RAD); }
 
 	/** 
 	* @returns The current angle of rotation in Radians
@@ -1160,31 +1168,28 @@ class Transformation extends EventDispatcher
 		// apply the transformation matrix to a point and
 		// calculate the rotation happened
 		// thanks to http://stackoverflow.com/users/1035293/bugshake
-
-		var translate:Point;
 		var scale:Float;
 
-		var m:Matrix = getMatrix();
+		var m:Matrix = getMatrixInternal();
 
 		// extract translation
-		var p:Point = new Point(0,0);
-		translate = m.transformPoint(p);
-		m.translate( -translate.x, -translate.y);
+		Akifox.point.x = Akifox.point.y = 0;
+		Akifox.point2 = m.transformPoint(Akifox.point);
+		m.translate( -Akifox.point2.x, -Akifox.point2.y);
 
 		// extract (uniform) scale...
-		p.x = 1.0;
-		p.y = 0.0;
-		p = m.transformPoint(p);
-		scale = p.length;
+		Akifox.point.x = 1; Akifox.point.y = 0;
+		Akifox.point = m.transformPoint(Akifox.point);
+		scale = Akifox.point.length;
 
 		// ...and rotation
-		return Math.atan2(p.y, p.x);
+		return Math.atan2(Akifox.point.y, Akifox.point.x);
 	}
 
 	/** 
 	* @returns The current angle of rotation in Degrees
 	**/
-	public function getRotation():Float { return getRotationRad() * RAD2DEG; }
+	public function getRotation():Float { return getRotationRad() * Akifox.Akifox.RAD2DEG; }
 
 	/** Use getRotation and setRotation **/
 	public var rotation(get, set):Float;

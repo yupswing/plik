@@ -3,6 +3,7 @@ package com.akifox.lib;
 import openfl.display.Tilesheet;
 import openfl.text.Font;
 import openfl.display.DisplayObjectContainer;
+import openfl.display.Graphics;
 import openfl.display.Sprite;
 import openfl.display.Stage;
 import openfl.display.StageDisplayState;
@@ -15,6 +16,7 @@ import openfl.Lib;
 import openfl.display.BitmapData;
 import openfl.display.Bitmap;
 import openfl.display.DisplayObject;
+import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.geom.Matrix;
 import motion.Actuate;
@@ -25,9 +27,26 @@ import openfl.ui.Multitouch;
 import openfl.ui.MultitouchInputMode;
 
 import com.akifox.lib.Screen;
+import com.akifox.lib.atlas.TextureAtlas;
 
 class Akifox
 {
+
+	//##########################################################################################
+	
+	/** Constant factor to pass from degrees to radians **/
+    public static var DEG2RAD:Float = Math.PI/180;
+	/** Constant factor to pass from radians to degrees **/
+    public static var RAD2DEG:Float = 180/Math.PI;
+
+    // temporary objects (always reset them before using)
+    public static var point:Point = new Point();
+    public static var point2:Point = new Point();
+    public static var rect:Rectangle = new Rectangle();
+    public static var matrix:Matrix = new Matrix();
+
+	//##########################################################################################
+
 
 	public static var id:String = "";
 
@@ -53,9 +72,45 @@ class Akifox
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
 		#end
 
+		realresolution = [Lib.current.stage.stageWidth,Lib.current.stage.stageHeight];
+		setResolution();
+
 		multitouchEnable();
 
+	}
 
+
+	//##########################################################################################
+	//
+	// RESOLUTION MANAGEMENT
+	//
+	//##########################################################################################
+
+	public static var realresolution = [0.0,0.0];
+	public static var resolution = [0.0,0.0];
+	public static inline var _ratio:Float = 16/9;
+
+	private static var _pointFactor:Float = 1;
+	public static var pointFactor(get, never):Float;
+	private static function get_pointFactor():Float {
+		return _pointFactor;
+	}
+
+	public static function setResolution(){
+		var w:Float = realresolution[0];
+		if (w > 1920) { //2560
+				resolution = [2560,2560/_ratio];
+		} else if (w > 1280) { //1920
+				resolution = [1920,1920/_ratio];
+		} else if (w > 640) { //1280
+				resolution = [1280,1280/_ratio];
+		} else { //640
+				resolution = [640,640/_ratio];
+		}
+		//resolution = [1920,1920/_ratio];
+		_pointFactor = resolution[0]/2560;
+		//trace(resolution);
+		//trace(_pointFactor);
 	}
 
 	public static var multitouchOn:Bool = false;
@@ -111,7 +166,7 @@ class Akifox
 
 	//##########################################################################################
 	//
-	// SCENE MANAGMENT
+	// SCENE MANAGEMENT
 	//
 	//##########################################################################################
 
@@ -359,12 +414,25 @@ class Akifox
 	// Bitmap storage.
 	private static var _bitmap:Map<String,BitmapData> = new Map<String,BitmapData>();
 
+
+	private static function reloadBitmaps():Bool {
+		for (el in _bitmap.keys()) {
+			removeBitmap(el);
+			getBitmap(el);
+		}
+		return true;
+	}
+
+	public static function bitmapPath(name:String):String {
+		return "graphics_"+resolution[0]+"/"+name;
+	}
+
 	public static function getBitmap(name:String):BitmapData
 	{
 		if (_bitmap.exists(name))
 			return _bitmap.get(name);
 
-		var data:BitmapData = openfl.Assets.getBitmapData(name, false);
+		var data:BitmapData = openfl.Assets.getBitmapData(bitmapPath(name), false);
 
 		if (data != null)
 			_bitmap.set(name, data);
@@ -372,11 +440,11 @@ class Akifox
 		return data;
 	}
 
-/*	public static function overwriteBitmapCache(name:String, data:BitmapData):Void
+	public static function overwriteBitmapCache(name:String, data:BitmapData):Void
 	{
 		removeBitmap(name);
 		_bitmap.set(name, data);
-	}*/
+	}
 
 	public static function removeBitmap(name:String):Bool
 	{
@@ -393,44 +461,32 @@ class Akifox
 	//##########################################################################################
 
 	// Tilesheets storage.
-	private static var _tilesheet:Map<String,Tilesheet> = new Map<String,Tilesheet>();
+	private static var _textureatlas:Map<String,TextureAtlas> = new Map<String,TextureAtlas>();
 
-	public static function addTilesheet(name:String,columns:Int,rows:Int):Void {
-		if (_tilesheet.exists(name)) return;
-		var bitmap:BitmapData = getBitmap(name);
-		var tileWidth = bitmap.width / columns;
-		var tileHeight = bitmap.height / rows;
-		if (bitmap!=null) {
-			var data:Tilesheet = new Tilesheet(bitmap);
-			for (x in 0...columns)
-			{
-				for (y in 0...rows) {
-					data.addTileRect(new Rectangle(x*tileWidth, y*tileHeight, tileWidth, tileHeight));
-				}
-			}
-
-			if (data != null)
-				_tilesheet.set(name, data);
+	public static function getTextureAtlas(name:String):TextureAtlas
+	{
+		if (_textureatlas.exists(name))
+			return _textureatlas.get(name);
+		else {
+			var data:TextureAtlas = TextureAtlas.loadTexturePacker(name);
+			_textureatlas.set(name, data);
+			return data;
 		}
 	}
 
-	public static function getTilesheet(name:String):Tilesheet
+	public static function removeTextureAtlas(name:String):Bool
 	{
-		if (_tilesheet.exists(name))
-			return _tilesheet.get(name);
-
-		return null;
-	}
-
-	public static function removeTilesheet(name:String):Bool
-	{
-		if (_tilesheet.exists(name))
+		if (_textureatlas.exists(name))
 		{
-			var tilesheet = _tilesheet.get(name);
-			tilesheet = null;
-			return _tilesheet.remove(name);
+			var textureAtlas = _textureatlas.get(name);
+			textureAtlas.destroy();
+			return _textureatlas.remove(name);
 		}
 		return false;
+	}
+
+	public static function drawTextureAtlas(target:Graphics,name:String,region:String,x:Float,y:Float):Void {
+        getTextureAtlas(name).getRegion(region).drawNow(target,x,y);
 	}
 
 	//##########################################################################################

@@ -21,8 +21,8 @@ import motion.Actuate;
 class Screen extends Sprite
 {				
 	public var currentScale:Float = 1;
-	private var rwidth:Float = 500;
-	private var rheight:Float = 500;
+	public var rwidth:Float = 1;
+	public var rheight:Float = 1;
 
 	private var resizePow:Bool = false;
 
@@ -33,6 +33,8 @@ class Screen extends Sprite
 
 	public function new () {
 		super();
+		rwidth = Akifox.resolution[0];
+		rheight = Akifox.resolution[1];
 	}
 
 	// call at the loading
@@ -83,14 +85,15 @@ class Screen extends Sprite
 	private function update():Void { }
 
 	public function resize():Void {
+		//resizePow = true;
 		//Lib.application.window.width
 		//Lib.application.window.height
 		var screenWidth = Lib.current.stage.stageWidth;
 		var screenHeight = Lib.current.stage.stageHeight;
 
 		// leave margins
-		var maxWidth = screenWidth * 1.05;
-		var maxHeight = screenHeight * 1.05;
+		var maxWidth = screenWidth;// * 1.05;
+		var maxHeight = screenHeight;// * 1.05;
 		
 		currentScale = 1;
 		scaleX = 1;
