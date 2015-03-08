@@ -98,9 +98,12 @@ class Akifox
 
 	public static function setResolution(){
 		var w:Float = realresolution[0];
+		#if !ios
 		if (w > 1920) { //2560
 				resolution = [2560,2560/_ratio];
-		} else if (w > 1280) { //1920
+		} else 
+		#end
+		if (w > 1280) { //1920
 				resolution = [1920,1920/_ratio];
 		} else if (w > 640) { //1280
 				resolution = [1280,1280/_ratio];
@@ -109,7 +112,8 @@ class Akifox
 		}
 		//resolution = [1920,1920/_ratio];
 		_pointFactor = resolution[0]/2560;
-		//trace(resolution);
+		trace(realresolution);
+		trace(resolution);
 		//trace(_pointFactor);
 	}
 
