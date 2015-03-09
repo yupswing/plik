@@ -110,7 +110,8 @@ class Akifox
 		} else { //640
 				resolution = [640,640/_ratio];
 		}
-		//resolution = [1920,1920/_ratio];
+		//resolution = [640,640/_ratio];
+		//resolution = [2560,2560/_ratio];
 		_pointFactor = resolution[0]/2560;
 		trace(realresolution);
 		trace(resolution);
@@ -429,6 +430,12 @@ class Akifox
 
 	public static function bitmapPath(name:String):String {
 		return "graphics_"+resolution[0]+"/"+name;
+	}
+
+	public static function preloadBitmap(name:String):Void {
+		var data:BitmapData = openfl.Assets.getBitmapData(bitmapPath(name), false);
+		if (data != null) _bitmap.set(name, data);
+		data = null;
 	}
 
 	public static function getBitmap(name:String):BitmapData

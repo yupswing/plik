@@ -102,7 +102,7 @@ class Screen extends Sprite
 		var currentWidth = rwidth; //use width foau
 		var currentHeight = rheight;
 		
-		if (currentWidth > maxWidth || currentHeight > maxHeight) {
+		//if (currentWidth > maxWidth || currentHeight > maxHeight) {
 			var maxScaleX = maxWidth / currentWidth;
 			var maxScaleY = maxHeight / currentHeight;
 			if (maxScaleX < maxScaleY) {
@@ -132,7 +132,7 @@ class Screen extends Sprite
 
 			scaleX = currentScale;
 			scaleY = currentScale;
-		}
+		//}
 		
 		x = screenWidth / 2 - (currentWidth * currentScale) / 2;
 		y = screenHeight / 2 - (currentHeight * currentScale) / 2;
