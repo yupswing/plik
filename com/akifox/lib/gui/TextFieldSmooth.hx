@@ -11,7 +11,7 @@ import openfl.text.AntiAliasType;
 // TODO Editing going on to support transformations
 // will be finished when Transform.hx is done
 
-#if flash
+#if (flash || next)
 // this class it's a TextField
 // Flash renders the TextField beautifully and it doesn't need any trick
 class TextFieldSmooth extends TextField
@@ -30,7 +30,7 @@ class TextFieldSmooth extends Bitmap
 	var textFieldSize:Int;
 	var textFieldAlign:String;
 
- 	#if !flash
+ 	#if (!flash && !next)
  	// make the use of .text the same in every target
  	var textFieldBitmapData:BitmapData;
  	
@@ -63,7 +63,7 @@ class TextFieldSmooth extends Bitmap
 	    textFieldAlign = align;
 
 
-	    #if flash
+ 		#if (flash || next)
 		    // this class it's actually a TextField
 		    textField = this;
 	    #else

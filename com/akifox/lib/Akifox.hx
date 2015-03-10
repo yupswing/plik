@@ -679,7 +679,7 @@ class Akifox
 	}
 
 	public static function quit(){
-		#if (!flash && !html5)
+		#if (!flash && !html5 && !next)
 		Lib.exit();
 		#end
 	}
