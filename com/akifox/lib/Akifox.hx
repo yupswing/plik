@@ -593,25 +593,20 @@ class Akifox
 	// PREFERENCES
 	//
 	//##########################################################################################
+	
+	private static inline var prefID = 'pref';
 
-	private static var prefData:Data;
-	private static var prefFields:Map<String,String>=null;
-
-	public static function setPrefField(name:String,type:String,defaultValue:Dynamic){
-		if (prefFields == null) return;
-		prefFields[name] = type;
-		setPref(name,getPref(name,defaultValue));
+	public static function setPrefField(name:String,type:Int,defaultValue:Dynamic){
+		Data.setDataField(prefID,name,type,defaultValue);
 	}
 
-	public static function loadPref() {
-		// load pref
-		prefData = new Data("pref");
+	public static function initPref() {
 
-		// set base pref fields
-		prefFields = new Map<String,String>();
-		setPrefField('music','bool',true);
-		setPrefField('sound','bool',true);
-		setPrefField('fullscreen','bool',true);
+		Data.loadData(prefID);
+
+		setPrefField('music',Data.BOOL,true);
+		setPrefField('sound',Data.BOOL,true);
+		setPrefField('fullscreen',Data.BOOL,true);
 
 		// toggle base pref
 		if (getPref('music')) toggleMusic();
@@ -620,32 +615,25 @@ class Akifox
 	}
 
 	public static function savePref() {
-		prefData.save();
+		Data.saveData(prefID);
 	}
 
 
 	//standard are 'music' 'sound' 'fullscreen'
 	public static function getPref(name:String,?defaultValue:Dynamic=null):Dynamic {
-		var type = 'dynamic';
-		if (prefFields.exists(name)) {
-			type = prefFields[name];
-		}
-
-		switch (type) {
-			case 'string':
-				return prefData.readString(name,defaultValue);
-			case 'int':
-				return prefData.readInt(name,defaultValue);
-			case 'bool':
-				return prefData.readBool(name,defaultValue);
-		}
-		return prefData.read(name,defaultValue);
+		return Data.readData(prefID,name,defaultValue);
 	}
 
 	public static function setPref(name:String,value:Dynamic) {
-		prefData.write(name,value);
+		Data.writeData(prefID,name,value);
 	}
 
+	//##########################################################################################
+	//
+	// UID
+	//
+	//##########################################################################################
+	
 	private static var UID_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 	public static function randomUID(?size:Int=32):String
