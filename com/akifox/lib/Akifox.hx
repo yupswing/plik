@@ -22,6 +22,8 @@ import openfl.geom.Matrix;
 import motion.Actuate;
 import motion.easing.*;
 
+import openfl.system.Capabilities;
+
 import openfl.events.TouchEvent;
 import openfl.ui.Multitouch;
 import openfl.ui.MultitouchInputMode;
@@ -72,7 +74,15 @@ class Akifox
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
 		#end
 
+
+/*		trace(openfl.system.Capabilities.screenResolutionX,'x',
+			  openfl.system.Capabilities.screenResolutionY,'@',
+			  openfl.system.Capabilities.screenDPI);*/
+		#if !flash
+		realresolution = [Capabilities.screenResolutionX,Capabilities.screenResolutionY];
+		#else
 		realresolution = [Lib.current.stage.stageWidth,Lib.current.stage.stageHeight];
+		#end
 		setResolution();
 
 		multitouchEnable();
@@ -113,8 +123,7 @@ class Akifox
 		//resolution = [640,640/_ratio];
 		//resolution = [2560,2560/_ratio];
 		_pointFactor = resolution[0]/2560;
-		trace(realresolution);
-		trace(resolution);
+		//trace('real: ',realresolution,' game: ',resolution);
 		//trace(_pointFactor);
 	}
 
@@ -602,7 +611,7 @@ class Akifox
 		prefFields = new Map<String,String>();
 		setPrefField('music','bool',true);
 		setPrefField('sound','bool',true);
-		setPrefField('fullscreen','bool',false);
+		setPrefField('fullscreen','bool',true);
 
 		// toggle base pref
 		if (getPref('music')) toggleMusic();
@@ -667,7 +676,7 @@ class Akifox
 	var _fullscreenOn = false;
 	#if mobile
 		_fullscreenOn = true;
-	#else
+	#elseif !flash
 		if(Lib.current.stage.displayState != StageDisplayState.FULL_SCREEN_INTERACTIVE){
 			Lib.current.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
 			_fullscreenOn = true;
