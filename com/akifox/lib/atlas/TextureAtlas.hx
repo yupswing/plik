@@ -25,7 +25,7 @@ class TextureAtlas extends Atlas
 	 */
 	public static function loadTexturePacker(file:String):TextureAtlas
 	{
-		var xml = Xml.parse(Assets.getText(Akifox.bitmapPath(file)));
+		var xml = Xml.parse(Assets.getText(Gfx.bitmapPath(file)));
 		var root = xml.firstElement();
 		var atlas = new TextureAtlas(root.get("imagePath"));
 		for (sprite in root.elements())

@@ -18,6 +18,10 @@ class Sfx
 	@:dox(hide) // mistaken for a class function
 	public var complete:Void -> Void;
 
+    public function toString():String {
+        return '[Akifox.Sfx]';
+    }
+
 	/**
 	 * Creates a sound effect from an embedded source. Store a reference to
 	 * this object so that you can play the sound using play() or loop().

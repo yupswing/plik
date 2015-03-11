@@ -13,8 +13,6 @@ import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
 import openfl.ui.Keyboard;
 import openfl.Lib;
-import openfl.display.BitmapData;
-import openfl.display.Bitmap;
 import openfl.display.DisplayObject;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
@@ -29,7 +27,6 @@ import openfl.ui.Multitouch;
 import openfl.ui.MultitouchInputMode;
 
 import com.akifox.lib.Screen;
-import com.akifox.lib.atlas.TextureAtlas;
 
 class Akifox
 {
@@ -40,6 +37,13 @@ class Akifox
     public static var DEG2RAD:Float = Math.PI/180;
 	/** Constant factor to pass from radians to degrees **/
     public static var RAD2DEG:Float = 180/Math.PI;
+
+	public static inline var TRANSITION_NONE:String = "NONE";
+	public static inline var TRANSITION_ALPHA:String = "ALPHA";
+	public static inline var TRANSITION_SLIDE_DOWN:String = "SLIDEUP";
+	public static inline var TRANSITION_SLIDE_UP:String = "SLIDEDOWN";
+	public static inline var TRANSITION_SLIDE_LEFT:String = "SLIDELEFT";
+	public static inline var TRANSITION_SLIDE_RIGHT:String = "SLIDERIGHT";
 
     // temporary objects (always reset them before using)
     public static var point:Point = new Point();
@@ -61,7 +65,7 @@ class Akifox
 			throw new Error("AKIFOX Error: Cannot initialize screen container. The value is null.");
 		}
 		id = appid;
-		_transition_mode = Constants.TRANSITION_NONE;
+		_transition_mode = TRANSITION_NONE;
 
 		//sound init
 		initSfx();
@@ -96,9 +100,17 @@ class Akifox
 	//
 	//##########################################################################################
 
-	public static var realresolution = [0.0,0.0];
-	public static var resolution = [0.0,0.0];
-	public static inline var _ratio:Float = 16/9;
+	private static var realresolution = [0.0,0.0];
+	private static var resolution = [0.0,0.0];
+	public static var resolutionX(get,never):Float;
+	private static function get_resolutionX():Float{
+		return resolution[0];
+	}
+	public static var resolutionY(get,never):Float;
+	private static function get_resolutionY():Float{
+		return resolution[1];
+	}
+	private static inline var _ratio:Float = 16/9;
 
 	private static var _pointFactor:Float = 1;
 	public static var pointFactor(get, never):Float;
@@ -192,7 +204,7 @@ class Akifox
 	private static var _holdScene(default, null):Screen;
 	private static var _screenContainer:DisplayObjectContainer;
 
-	public static var _transition_mode:String = ""; // USE Constants.TRANSITION_XXX
+	public static var _transition_mode:String = ""; // USE TRANSITION_XXX
 
 	private static var _isSceneOnHold:Bool=false;
 	private static var _makeSceneOnHold:Bool=false;
@@ -229,17 +241,16 @@ class Akifox
 
 	private static function destroyScene(scene:Screen) {
 		if (scene==null) return;
+    	#if gbcheck
+    	trace('AKIFOX ---------- start removing scene ---------------');
+    	#end
 		scene.unload();
-		if (scene.numChildren != 0) {			
-			var i:Int = scene.numChildren;	
-			//trace('destroy ',i);		
-			do {
-				i--;
-				scene.removeChildAt(i);												
-			} while (i > 0);
-		}			
+		scene.destroy();
 		_screenContainer.removeChild(scene);
 		scene = null;
+    	#if gbcheck
+    	trace('AKIFOX ---------- scene removed ---------------');
+    	#end
 	}
 
 	public static function changeScreen(?newScreen:Screen=null,?transition:String="") {
@@ -271,7 +282,7 @@ class Akifox
 		var isResume = (newScreen==null && modal == false);
 		var isMakeHold = (newScreen!=null && modal == true);
 
-		if (_holdScene==null && !isMakeHold) Actuate.reset();
+		//if (_holdScene==null && !isMakeHold) Actuate.reset();
 
 		if (_screenContainer != null) {
 
@@ -281,7 +292,7 @@ class Akifox
 			currentHeight = Lib.current.stage.stageHeight;
 
 			if (transition != "") _transition_mode = transition;
-			//_transition_mode = Constants.TRANSITION_NONE;
+			//_transition_mode = TRANSITION_NONE;
 
 			if (_currentScene != null) {
 
@@ -336,7 +347,7 @@ class Akifox
 	public static function sceneReady():Void {
 		//trace('3. scene ready');
 
-		if (_transition_mode == Constants.TRANSITION_NONE) {
+		if (_transition_mode == TRANSITION_NONE) {
 			sceneStart();
 			return;
 		}
@@ -359,32 +370,32 @@ class Akifox
 		}
 
 		switch (_transition_mode) {
-			case Constants.TRANSITION_ALPHA:
+			case TRANSITION_ALPHA:
 				_currentScene.alpha = 0;
 				if (_oldScene!=null) Actuate.tween (_oldScene, timing, { alpha: 0 }).delay(delay);
 				Actuate.tween (_currentScene, timing, { alpha: 1 }).delay(delay).onComplete(sceneStart);
-			case Constants.TRANSITION_SLIDE_UP:
+			case TRANSITION_SLIDE_UP:
 				_currentScene.y += currentHeight+_transition_span;
 				if (_oldScene!=null) {
 					Actuate.tween (_oldScene, timing, { y: oldY-currentHeight-_transition_span }).ease(ghostEase).delay(delay);
 					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
 				}
 				Actuate.tween (_currentScene, timing, { y: baseY }).ease(sceneEase).delay(delay).onComplete(sceneStart);
-			case Constants.TRANSITION_SLIDE_DOWN:
+			case TRANSITION_SLIDE_DOWN:
 				_currentScene.y -= currentHeight+_transition_span;
 				if (_oldScene!=null) {
 					Actuate.tween (_oldScene, timing, { y: oldY+currentHeight+_transition_span }).ease(ghostEase).delay(delay);
 					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
 				}
 				Actuate.tween (_currentScene, timing, { y: baseY }).ease(sceneEase).delay(delay).onComplete(sceneStart);
-			case Constants.TRANSITION_SLIDE_LEFT:
+			case TRANSITION_SLIDE_LEFT:
 				_currentScene.x += currentWidth+_transition_span;
 				if (_oldScene!=null) {
 					Actuate.tween (_oldScene, timing, { x: oldX-currentWidth-_transition_span }).ease(ghostEase).delay(delay);
 					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
 				}
 				Actuate.tween (_currentScene, timing, { x: baseX }).ease(sceneEase).delay(delay).onComplete(sceneStart);
-			case Constants.TRANSITION_SLIDE_RIGHT:
+			case TRANSITION_SLIDE_RIGHT:
 				_currentScene.x -= currentWidth+_transition_span;
 				if (_oldScene!=null) {
 					Actuate.tween (_oldScene, timing, { x: oldX+currentWidth+_transition_span }).ease(ghostEase).delay(delay);	
@@ -425,90 +436,6 @@ class Akifox
 	//
 	//##########################################################################################
 
-	// Bitmap storage.
-	private static var _bitmap:Map<String,BitmapData> = new Map<String,BitmapData>();
-
-
-	private static function reloadBitmaps():Bool {
-		for (el in _bitmap.keys()) {
-			removeBitmap(el);
-			getBitmap(el);
-		}
-		return true;
-	}
-
-	public static function bitmapPath(name:String):String {
-		return "graphics_"+resolution[0]+"/"+name;
-	}
-
-	public static function preloadBitmap(name:String):Void {
-		var data:BitmapData = openfl.Assets.getBitmapData(bitmapPath(name), false);
-		if (data != null) _bitmap.set(name, data);
-		data = null;
-	}
-
-	public static function getBitmap(name:String):BitmapData
-	{
-		if (_bitmap.exists(name))
-			return _bitmap.get(name);
-
-		var data:BitmapData = openfl.Assets.getBitmapData(bitmapPath(name), false);
-
-		if (data != null)
-			_bitmap.set(name, data);
-
-		return data;
-	}
-
-	public static function overwriteBitmapCache(name:String, data:BitmapData):Void
-	{
-		removeBitmap(name);
-		_bitmap.set(name, data);
-	}
-
-	public static function removeBitmap(name:String):Bool
-	{
-		if (_bitmap.exists(name))
-		{
-			var bitmap = _bitmap.get(name);
-			bitmap.dispose();
-			bitmap = null;
-			return _bitmap.remove(name);
-		}
-		return false;
-	}
-
-	//##########################################################################################
-
-	// Tilesheets storage.
-	private static var _textureatlas:Map<String,TextureAtlas> = new Map<String,TextureAtlas>();
-
-	public static function getTextureAtlas(name:String):TextureAtlas
-	{
-		if (_textureatlas.exists(name))
-			return _textureatlas.get(name);
-		else {
-			var data:TextureAtlas = TextureAtlas.loadTexturePacker(name);
-			_textureatlas.set(name, data);
-			return data;
-		}
-	}
-
-	public static function removeTextureAtlas(name:String):Bool
-	{
-		if (_textureatlas.exists(name))
-		{
-			var textureAtlas = _textureatlas.get(name);
-			textureAtlas.destroy();
-			return _textureatlas.remove(name);
-		}
-		return false;
-	}
-
-	public static function drawTextureAtlas(target:Graphics,name:String,region:String,x:Float,y:Float):Void {
-        getTextureAtlas(name).getRegion(region).drawNow(target,x,y);
-	}
-
 	//##########################################################################################
 
 	// Font storage.
@@ -526,12 +453,6 @@ class Akifox
 
 		return data;
 	}
-
-/*	public static function overwriteBitmapCache(name:String, data:Font):Void
-	{
-		removeFont(name);
-		_font.set(name, data);
-	}*/
 
 	public static function removeFont(name:String):Bool
 	{

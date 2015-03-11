@@ -73,8 +73,8 @@ class Transformation extends EventDispatcher
 		this.target = target;
 		realWidth = target.width;
 		realHeight = target.height;
-		realX = target.x;
-		realY = target.y;
+		realX = target.transform.matrix.tx;
+		realY = target.transform.matrix.ty;
 		spriteDebug = new Sprite();
 
 		if (pivot==null) {
@@ -86,6 +86,13 @@ class Transformation extends EventDispatcher
 		}
 	}
 
+	public function destroy(){
+		this.target = null;
+		this.spriteDebug = null;
+		this.matrix = null;
+		this.offsetPoint = null;
+	}
+
 	/**
 	* When the size is changed externally of the Transformation class
    	* you should use this method to update the size internally
@@ -95,7 +102,7 @@ class Transformation extends EventDispatcher
    	* call this method
    	*
 	**/
-    public function updateSize() {
+    public function updateSize(nw:Float=0,nh:Float=0) {
     	/*  */
 
 		// get current translation and the complete matrix
@@ -106,8 +113,13 @@ class Transformation extends EventDispatcher
     	this.identity();
 
     	// get the real width and height without transformations
-    	realWidth = target.width;
-    	realHeight = target.height;
+    	if (nw==0 || nh==0) {
+	    	realWidth = target.width;
+	    	realHeight = target.height;
+	    } else {
+	    	realWidth = nw;
+	    	realHeight = nh;
+	    }
 
     	// reset the anchored pivot (based on new size)
     	if (this.pivotPointAnchor!=-1) setAnchoredPivot(this.pivotPointAnchor);

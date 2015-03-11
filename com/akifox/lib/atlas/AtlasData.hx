@@ -99,7 +99,7 @@ class AtlasData
 		}
 		else if(create)
 		{
-			var bitmap:BitmapData = Akifox.getBitmap(name);
+			var bitmap:BitmapData = Gfx.getBitmap(name);
 			if (bitmap != null)
 			{
 				data = new AtlasData(bitmap, name);
@@ -122,7 +122,7 @@ class AtlasData
 	 */
 	public function reload(bd:BitmapData):Void
 	{
-		Akifox.overwriteBitmapCache(_name, bd);
+		Gfx.overwriteBitmapCache(_name, bd);
 	}
 
 	/**
@@ -156,7 +156,7 @@ class AtlasData
 	 */
 	public function destroy():Void
 	{
-		Akifox.removeBitmap(_name);
+		Gfx.removeBitmap(_name);
 		_dataPool.remove(_name);
 	}
 

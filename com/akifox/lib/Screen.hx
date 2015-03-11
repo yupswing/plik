@@ -18,7 +18,7 @@ import motion.Actuate;
 
 
  */
-class Screen extends Sprite
+class Screen extends Sprite implements IDestroyable
 {				
 	public var currentScale:Float = 1;
 	public var rwidth:Float = 1;
@@ -33,8 +33,8 @@ class Screen extends Sprite
 
 	public function new () {
 		super();
-		rwidth = Akifox.resolution[0];
-		rheight = Akifox.resolution[1];
+		rwidth = Akifox.resolutionX;
+		rheight = Akifox.resolutionY;
 	}
 
 	// call at the loading
@@ -48,6 +48,34 @@ class Screen extends Sprite
 
 		resize();
 		Akifox.sceneReady();
+	}
+
+	public override function toString():String {
+		return "[Akifox.Screen]";
+	}
+
+	private var _dead:Bool=false;
+	public var dead(get,never):Bool;
+    public function get_dead():Bool { return _dead; }
+
+	public function destroy():Void {
+		_dead = true;
+        motion.Actuate.tween(this,0,{});
+        motion.Actuate.stop(this);
+
+		if (numChildren != 0) {
+			var i:Int = numChildren;	
+			var child:Dynamic;
+			do {
+				i--;
+				child = getChildAt(i);
+		    	#if gbcheck
+		    	trace('AKIFOX - Launch destroy on ' + child);
+		    	#end
+				child.destroy();
+				removeChildAt(i);							
+			} while (i > 0);
+		}
 	}
 
 	// call at the unloading
