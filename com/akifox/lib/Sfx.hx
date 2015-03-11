@@ -37,8 +37,14 @@ class Sfx
 
 		if (Std.is(source, String))
 		{
-			_sound = Assets.getSound(source);
-			_sounds.set(source, _sound);
+			if (_sounds.exists(source)) {
+				//trace('cache '+source);
+				_sound = _sounds[source];
+			} else {
+				//trace('load '+source);
+				_sound = Assets.getSound(source,false);
+				_sounds.set(source, _sound);
+			}
 		}
 		else
 		{
@@ -340,6 +346,17 @@ class Sfx
 				sfx.volume = sfx.volume;
 			}
 		}
+	}
+
+	static public function removeSound(name:String):Bool {
+		if (_sounds.exists(name))
+		{
+			var sound = _sounds.get(name);
+			sound.close();
+			sound = null;
+			return _sounds.remove(name);
+		}
+		return false;
 	}
 
 	// Sound infromation.

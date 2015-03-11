@@ -64,15 +64,15 @@ class Akifox
 		_transition_mode = Constants.TRANSITION_NONE;
 
 		//sound init
-		Sfx.setVolume('sound',0);
+		initSfx();
 
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_IN,focus);
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_OUT,defocus);
 		Lib.current.stage.addEventListener(Event.ACTIVATE,focus);
 		Lib.current.stage.addEventListener(Event.DEACTIVATE,defocus);
-		#if !mobile
-		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
-		#end
+		//#if !mobile
+		//Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
+		//#end
 
 
 /*		trace(openfl.system.Capabilities.screenResolutionX,'x',
@@ -545,12 +545,69 @@ class Akifox
 	}
 
 	private static var _music:Sfx;
+	private static var _musicOut:Sfx;
+	private static var _musicLast:String;
 	private static var _musicOn:Bool=false;
 	private static var _soundOn:Bool=false;
 
-	public static function setMusic(file:String) {
-		_music = new Sfx(file);
-		_music.type = "music";
+	public static function initSfx(){
+		Sfx.setVolume('sound',0);
+		Sfx.setVolume('music',1); //fixed
+	}
+
+	public static function startMusic(file:String=null,?direct:Bool=false) {
+		if (!_musicOn) {
+			if (file!=null) _musicLast = file;
+			return;
+		}
+		if ((file==_musicLast) || (file==null && _music != null)) return; //already started
+
+		Actuate.stop(_music);
+		Actuate.stop(_musicOut);
+
+		if (_musicOut!=null) _musicOut.stop();
+		if (_music!=null) {
+			_musicOut = _music;
+			_musicOut.volume = 1;
+			Actuate.tween(_musicOut, 2, {volume:0}).ease(Sine.easeOut).onComplete(function(){
+				_musicOut.stop();
+				_musicOut = null;
+			});
+		}
+
+		if (file==null) {
+			if (_musicLast==null) return;
+			file = _musicLast;
+		} else {
+			_musicLast = file;
+		}
+		
+		_music = getMusic(file);
+		_music.loop();
+		if (!direct) {
+			_music.volume = 0;
+			Actuate.tween(_music, 2, {volume:1}).ease(Sine.easeOut);
+		}
+	}
+
+	public static function stopMusic() {
+		if (!_musicOn || _music == null) return;
+		Actuate.stop(_music);
+		_music.volume = 1;
+		Actuate.tween(_music, 0.5, {volume:0}).ease(Sine.easeOut).onComplete(function(){
+			_music.stop();
+			_music = null;
+		});
+	}
+
+	public static function prepareMusic(file:String) {
+		_musicLast = file;
+	}
+
+	private static function getMusic(file:String):Sfx {
+		var _m = new Sfx(file);
+		_m.type = "music";
+		return _m;
 	}
 
 	public static function getMusicOn():Bool {
@@ -563,11 +620,11 @@ class Akifox
 
 	public static function toggleMusic():Bool {
 		if(_musicOn) {
+			stopMusic();
 			_musicOn = false;
-			_music.stop();
 		} else {
 			_musicOn = true;
-			_music.loop();
+			startMusic();
 		}
 		setPref('music',_musicOn);
 		savePref();
