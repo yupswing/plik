@@ -4,7 +4,7 @@
 [![OpenFL 2](https://img.shields.io/badge/require-OpenFL 2-red.svg)](http://www.openfl.org)
 [![Cross platform](https://img.shields.io/badge/platform-cross%20platform-lightgrey.svg)](http://www.openfl.org)
 
-# akifox-transform (com.akifox.lib.geom.Transformation)
+# akifox-transform (com.akifox.plik.geom.Transformation)
 **Transformation HAXE/OpenFL Class**
 
 The akifox-transform class aims to provide an easy tool to manage affine transformations using a reliable pivot point.
@@ -57,20 +57,20 @@ import com.akifox.transform.Transformation;
 -------------
 
 If you want to use instead the latest version you should use this library
-**com.akifox.lib.geom.Transformation**
+**com.akifox.plik.geom.Transformation**
 ```
-haxelib git akifox-transform https://github.com/yupswing/akifox-lib.git
+haxelib git akifox-transform https://github.com/yupswing/plik.git
 ```
 
 In your project add the library reference in your ```project.xml```
 
 ```
-<haxelib name="akifox-lib" />
+<haxelib name="plik" />
 ```
 
 and finally you can import it in your project class with this import
 ```
-import com.akifox.lib.geom.Transformation;
+import com.akifox.plik.geom.Transformation;
 ```
 
 ## Documentation
@@ -85,7 +85,7 @@ Once you got a DisplayObject (Sprites, Bitmap...) you can create a Transformatio
 (Don't use more than one transformation at a given time. I will code this check later on)
 
 ````haxe
-import com.akifox.transform.Transformation; //or com.akifox.lib.Transformation
+import com.akifox.transform.Transformation; //or com.akifox.plik.geom.Transformation
 
 // [...]
     trf = new Transformation(YOUROBJECT);

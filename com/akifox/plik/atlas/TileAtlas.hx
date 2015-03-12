@@ -1,4 +1,4 @@
-package com.akifox.lib.atlas;
+package com.akifox.plik.atlas;
 import openfl.display.BitmapData;
 
 class TileAtlas extends Atlas
@@ -43,20 +43,20 @@ class TileAtlas extends Atlas
 		var cols:Int = Math.floor(_data.width / tileWidth);
 		var rows:Int = Math.floor(_data.height / tileHeight);
 
-		Akifox.rect.width = tileWidth;
-		Akifox.rect.height = tileHeight;
+		PLIK.rect.width = tileWidth;
+		PLIK.rect.height = tileHeight;
 
-		Akifox.point.x = Akifox.point.y = 0;
+		PLIK.point.x = PLIK.point.y = 0;
 
 		for (y in 0...rows)
 		{
-			Akifox.rect.y = y * (tileHeight+tileMarginHeight);
+			PLIK.rect.y = y * (tileHeight+tileMarginHeight);
 
 			for (x in 0...cols)
 			{
-				Akifox.rect.x = x * (tileWidth+tileMarginWidth);
+				PLIK.rect.x = x * (tileWidth+tileMarginWidth);
 
-				_regions.push(_data.createRegion(Akifox.rect, Akifox.point));
+				_regions.push(_data.createRegion(PLIK.rect, PLIK.point));
 			}
 		}
 	}

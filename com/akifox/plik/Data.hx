@@ -1,4 +1,4 @@
-package com.akifox.lib;
+package com.akifox.plik;
 
 import openfl.net.SharedObject;
 
@@ -189,7 +189,7 @@ class Data
 	// Data information.
 	private var _shared:SharedObject;
 	private var _data:Map<String,Dynamic> = new Map<String,Dynamic>();
-	private static inline var PREFIX:String = "Akifox";
+	private static inline var PREFIX:String = "PLIK";
 	private static inline var DEFAULT_FILE:String = "_default";
 	private static inline var SIZE:Int = 10000;
 }

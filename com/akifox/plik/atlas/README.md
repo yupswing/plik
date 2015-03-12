@@ -1,4 +1,4 @@
-# com.akifox.lib.atlas
+# com.akifox.plik.atlas
 Texture Atlas Manager
 
 Based on HaxePunk Atlas

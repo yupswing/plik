@@ -1,5 +1,5 @@
 
-package com.akifox.lib.geom;
+package com.akifox.plik.geom;
 
 interface ITransformable 
 {

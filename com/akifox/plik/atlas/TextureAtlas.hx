@@ -1,11 +1,11 @@
-package com.akifox.lib.atlas;
+package com.akifox.plik.atlas;
 
 import openfl.display.BitmapData;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.Assets;
 
-import com.akifox.lib.atlas.AtlasData;
+import com.akifox.plik.atlas.AtlasData;
 
 class TextureAtlas extends Atlas
 {
@@ -30,24 +30,24 @@ class TextureAtlas extends Atlas
 		var atlas = new TextureAtlas(root.get("imagePath"));
 		for (sprite in root.elements())
 		{
-			Akifox.point.x = 0;
-			Akifox.point.y = 0;
-			if (sprite.exists("frame_x")) Akifox.point.x = Std.parseInt(sprite.get("frame_x"));
-			if (sprite.exists("frame_y")) Akifox.point.y = Std.parseInt(sprite.get("frame_y"));
+			PLIK.point.x = 0;
+			PLIK.point.y = 0;
+			if (sprite.exists("frame_x")) PLIK.point.x = Std.parseInt(sprite.get("frame_x"));
+			if (sprite.exists("frame_y")) PLIK.point.y = Std.parseInt(sprite.get("frame_y"));
 
-			Akifox.rect.x = Std.parseInt(sprite.get("x"));
-			Akifox.rect.y = Std.parseInt(sprite.get("y"));
-			if (sprite.exists("w")) Akifox.rect.width = Std.parseInt(sprite.get("w"));
-			else if (sprite.exists("width")) Akifox.rect.width = Std.parseInt(sprite.get("width"));
-			if (sprite.exists("h")) Akifox.rect.height = Std.parseInt(sprite.get("h"));
-			else if (sprite.exists("height")) Akifox.rect.height = Std.parseInt(sprite.get("height"));
+			PLIK.rect.x = Std.parseInt(sprite.get("x"));
+			PLIK.rect.y = Std.parseInt(sprite.get("y"));
+			if (sprite.exists("w")) PLIK.rect.width = Std.parseInt(sprite.get("w"));
+			else if (sprite.exists("width")) PLIK.rect.width = Std.parseInt(sprite.get("width"));
+			if (sprite.exists("h")) PLIK.rect.height = Std.parseInt(sprite.get("h"));
+			else if (sprite.exists("height")) PLIK.rect.height = Std.parseInt(sprite.get("height"));
 
 			// set the defined region
 			var name = if (sprite.exists("n")) sprite.get("n")
 						else if (sprite.exists("name")) sprite.get("name")
 						else throw("Unable to find the region's name.");
 
-			var region = atlas.defineRegion(name, Akifox.rect, Akifox.point);
+			var region = atlas.defineRegion(name, PLIK.rect, PLIK.point);
 
 			if (sprite.exists("r") && sprite.get("r") == "y") region.rotated = true;
 		}

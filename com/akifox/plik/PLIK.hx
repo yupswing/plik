@@ -1,4 +1,4 @@
-package com.akifox.lib;
+package com.akifox.plik;
 
 import openfl.display.Tilesheet;
 import openfl.text.Font;
@@ -26,9 +26,9 @@ import openfl.events.TouchEvent;
 import openfl.ui.Multitouch;
 import openfl.ui.MultitouchInputMode;
 
-import com.akifox.lib.Screen;
+import com.akifox.plik.Screen;
 
-class Akifox
+class PLIK
 {
 
 	//##########################################################################################
@@ -282,7 +282,7 @@ class Akifox
 		var isResume = (newScreen==null && modal == false);
 		var isMakeHold = (newScreen!=null && modal == true);
 
-		//if (_holdScene==null && !isMakeHold) Actuate.reset();
+		//if (_holdScene==null && !isMakeHold) Actuate.reset(); //TODO to be reactivated???
 
 		if (_screenContainer != null) {
 

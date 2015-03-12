@@ -1,4 +1,4 @@
-package com.akifox.lib.debug;
+package com.akifox.plik.debug;
 import haxe.Timer;
 import openfl.display.FPS;
 import openfl.display.Sprite;
@@ -19,9 +19,9 @@ import openfl.Lib;
  * Haxe/OpenFL class to display memory usage.
  *
  * More informations here
- * https://github.com/yupswing/akifox-lib/tree/master/com/akifox/lib/debug
+ * https://github.com/yupswing/plik/tree/master/com/akifox/plik/debug
  *
- * @author Simone Cingano (yupswing) Akifox Studio
+ * @author Simone Cingano (yupswing) PLIK Studio
  * @licence MIT
  *
  * Based on this post written by Kirill Poletaev

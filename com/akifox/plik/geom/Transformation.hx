@@ -1,4 +1,4 @@
-package com.akifox.lib.geom;
+package com.akifox.plik.geom;
 
 import openfl.geom.Matrix;
 import openfl.geom.Point;
@@ -9,7 +9,7 @@ import openfl.display.DisplayObject;
 
 /**
 
-@author Simone Cingano (yupswing) [Akifox Studio](http://akifox.com)
+@author Simone Cingano (yupswing) [PLIK Studio](http://akifox.com)
 
 @version 2.0
 [Public repository](https://github.com/yupswing/akifox-transform/)
@@ -438,13 +438,13 @@ class Transformation extends EventDispatcher
     }
     private function getMatrixInternal():Matrix
     {
-    	Akifox.matrix.setTo(target.transform.matrix.a,
+    	PLIK.matrix.setTo(target.transform.matrix.a,
     					    target.transform.matrix.b,
     					    target.transform.matrix.c,
     					    target.transform.matrix.d,
     					    target.transform.matrix.tx,
     					    target.transform.matrix.ty);
-    	return Akifox.matrix;
+    	return PLIK.matrix;
     }
 
 	/** 
@@ -747,8 +747,8 @@ class Transformation extends EventDispatcher
 		// check null to avoid error on multiplication
 		var skewXRad:Float=-0.1;
 		var skewYRad:Float=-0.1;
-		if (skewXDeg!=-0.1) skewXRad = skewXDeg*Akifox.DEG2RAD;
-		if (skewYDeg!=-0.1) skewYRad = skewYDeg*Akifox.DEG2RAD;
+		if (skewXDeg!=-0.1) skewXRad = skewXDeg*PLIK.DEG2RAD;
+		if (skewYDeg!=-0.1) skewYRad = skewYDeg*PLIK.DEG2RAD;
 		setSkewRad(skewXRad,skewYRad);
 	}
 
@@ -832,7 +832,7 @@ class Transformation extends EventDispatcher
 		var skewXDeg:Float = skewDeg;
 		// if not specified it will set the x and y skew using the same value
 		if (skewYDeg==-0.1) skewYDeg = skewDeg;
-		skewRad(skewXDeg*Akifox.DEG2RAD,skewYDeg*Akifox.DEG2RAD);
+		skewRad(skewXDeg*PLIK.DEG2RAD,skewYDeg*PLIK.DEG2RAD);
 	}
 
 	/** 
@@ -870,9 +870,9 @@ class Transformation extends EventDispatcher
 	**/
     public function getSkewXRad():Float
     {
-		Akifox.point.x = 0; Akifox.point.y = 1;
-		Akifox.point = deltaTransformPoint(Akifox.point);
-		return -(Math.atan2(Akifox.point.y, Akifox.point.x) - Math.PI/2);
+		PLIK.point.x = 0; PLIK.point.y = 1;
+		PLIK.point = deltaTransformPoint(PLIK.point);
+		return -(Math.atan2(PLIK.point.y, PLIK.point.x) - Math.PI/2);
     }
 
    	/** 
@@ -882,9 +882,9 @@ class Transformation extends EventDispatcher
 	**/
 	public function getSkewYRad():Float
 	{
-		Akifox.point.x = 1; Akifox.point.y = 0;
-		Akifox.point = deltaTransformPoint(Akifox.point);
-		return Math.atan2(Akifox.point.y, Akifox.point.x);
+		PLIK.point.x = 1; PLIK.point.y = 0;
+		PLIK.point = deltaTransformPoint(PLIK.point);
+		return Math.atan2(PLIK.point.y, PLIK.point.x);
 	} 
 
    	/** 
@@ -892,14 +892,14 @@ class Transformation extends EventDispatcher
 	* 
 	* @returns the current skew on the X Axis in Degrees
 	**/
-    public function getSkewX():Float { return getSkewXRad()*Akifox.Akifox.RAD2DEG; }
+    public function getSkewX():Float { return getSkewXRad()*PLIK.PLIK.RAD2DEG; }
 
    	/** 
 	* **NOTE:** Could not be reliable if the scale is not uniform
 	* 
 	* @returns the current skew on the Y Axis in Degrees
 	**/
-	public function getSkewY():Float { return getSkewYRad()*Akifox.Akifox.RAD2DEG; }
+	public function getSkewY():Float { return getSkewYRad()*PLIK.PLIK.RAD2DEG; }
 
 	/** Use getSkewX and setSkewX **/
 	public var skewingX(get, set):Float;
@@ -1140,7 +1140,7 @@ class Transformation extends EventDispatcher
 	*
 	* @param angle The angle in Degrees 
 	**/
-	public function rotate(angle:Float):Void { rotateRad(angle*Akifox.DEG2RAD); }
+	public function rotate(angle:Float):Void { rotateRad(angle*PLIK.DEG2RAD); }
 
 	/** 
 	* Set the rotation on a given value
@@ -1169,7 +1169,7 @@ class Transformation extends EventDispatcher
 	*
 	* @param angle The absolute angle in Degrees
 	**/
-	public function setRotation(angle:Float):Float { return setRotationRad(angle*Akifox.DEG2RAD); }
+	public function setRotation(angle:Float):Float { return setRotationRad(angle*PLIK.DEG2RAD); }
 
 	/** 
 	* @returns The current angle of rotation in Radians
@@ -1185,23 +1185,23 @@ class Transformation extends EventDispatcher
 		var m:Matrix = getMatrixInternal();
 
 		// extract translation
-		Akifox.point.x = Akifox.point.y = 0;
-		Akifox.point2 = m.transformPoint(Akifox.point);
-		m.translate( -Akifox.point2.x, -Akifox.point2.y);
+		PLIK.point.x = PLIK.point.y = 0;
+		PLIK.point2 = m.transformPoint(PLIK.point);
+		m.translate( -PLIK.point2.x, -PLIK.point2.y);
 
 		// extract (uniform) scale...
-		Akifox.point.x = 1; Akifox.point.y = 0;
-		Akifox.point = m.transformPoint(Akifox.point);
-		scale = Akifox.point.length;
+		PLIK.point.x = 1; PLIK.point.y = 0;
+		PLIK.point = m.transformPoint(PLIK.point);
+		scale = PLIK.point.length;
 
 		// ...and rotation
-		return Math.atan2(Akifox.point.y, Akifox.point.x);
+		return Math.atan2(PLIK.point.y, PLIK.point.x);
 	}
 
 	/** 
 	* @returns The current angle of rotation in Degrees
 	**/
-	public function getRotation():Float { return getRotationRad() * Akifox.Akifox.RAD2DEG; }
+	public function getRotation():Float { return getRotationRad() * PLIK.PLIK.RAD2DEG; }
 
 	/** Use getRotation and setRotation **/
 	public var rotation(get, set):Float;

@@ -1,4 +1,4 @@
-package com.akifox.lib;
+package com.akifox.plik;
 
 import openfl.Assets;
 import openfl.Lib;
@@ -7,9 +7,9 @@ import openfl.display.BitmapData;
 import openfl.display.Bitmap;
 import openfl.display.Graphics;
 import openfl.display.DisplayObject;
-import com.akifox.lib.atlas.TextureAtlas;
-import com.akifox.lib.geom.Transformation;
-import com.akifox.lib.geom.ITransformable;
+import com.akifox.plik.atlas.TextureAtlas;
+import com.akifox.plik.geom.Transformation;
+import com.akifox.plik.geom.ITransformable;
 
 class Gfx extends Bitmap implements ITransformable implements IDestroyable {
 
@@ -23,7 +23,7 @@ class Gfx extends Bitmap implements ITransformable implements IDestroyable {
     }
 
     public override function toString():String {
-        return '[Akifox.Gfx "'+_name+'"]';
+        return '[PLIK.Gfx "'+_name+'"]';
     }
 
     public function destroyCache() {
@@ -158,7 +158,7 @@ class Gfx extends Bitmap implements ITransformable implements IDestroyable {
 	}
 
 	public static function bitmapPath(name:String):String {
-		return "graphics_"+Akifox.resolutionX+"/"+name;
+		return "graphics_"+PLIK.resolutionX+"/"+name;
 	}
 
 	public static function preloadBitmap(name:String):Void {

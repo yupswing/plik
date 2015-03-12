@@ -1,5 +1,5 @@
 
-package com.akifox.lib;
+package com.akifox.plik;
 import openfl.display.Sprite;
 
 class SpriteContainer extends Sprite implements IDestroyable {
@@ -9,7 +9,7 @@ class SpriteContainer extends Sprite implements IDestroyable {
 	}
 
 	public override function toString():String {
-		return "[Akifox.SpriteContainer <"+numChildren+" Elements>]";
+		return "[PLIK.SpriteContainer <"+numChildren+" Elements>]";
 	}
 
 	private var _dead:Bool=false;

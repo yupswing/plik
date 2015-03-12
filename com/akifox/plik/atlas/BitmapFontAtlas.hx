@@ -1,4 +1,4 @@
-package com.akifox.lib.atlas;
+package com.akifox.plik.atlas;
 
 import openfl.display.BitmapData;
 import openfl.geom.Rectangle;

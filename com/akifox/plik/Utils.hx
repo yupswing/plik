@@ -1,4 +1,4 @@
-package com.akifox.lib;
+package com.akifox.plik;
 
 import openfl.Lib;
 import openfl.display.BitmapData;

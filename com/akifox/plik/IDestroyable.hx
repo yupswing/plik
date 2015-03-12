@@ -1,5 +1,5 @@
 
-package com.akifox.lib;
+package com.akifox.plik;
 
 interface IDestroyable {
 

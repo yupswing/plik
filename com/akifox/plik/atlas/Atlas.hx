@@ -1,9 +1,9 @@
-package com.akifox.lib.atlas;
+package com.akifox.plik.atlas;
 
 import openfl.display.Sprite;
 import openfl.geom.Rectangle;
 
-import com.akifox.lib.atlas.AtlasData;
+import com.akifox.plik.atlas.AtlasData;
 
 class Atlas
 {

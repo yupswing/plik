@@ -1,4 +1,4 @@
-package com.akifox.lib;
+package com.akifox.plik;
 
 import openfl.events.Event;
 import openfl.media.Sound;
@@ -19,7 +19,7 @@ class Sfx
 	public var complete:Void -> Void;
 
     public function toString():String {
-        return '[Akifox.Sfx]';
+        return '[PLIK.Sfx]';
     }
 
 	/**

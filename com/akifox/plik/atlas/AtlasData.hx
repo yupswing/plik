@@ -1,4 +1,4 @@
-package com.akifox.lib.atlas;
+package com.akifox.plik.atlas;
 
 import openfl.display.BitmapData;
 import openfl.display.Graphics;
@@ -315,8 +315,8 @@ class AtlasData
 		}
 		else
 		{
-			var cos = Math.cos(angle * Akifox.DEG2RAD);
-			var sin = Math.sin(angle * Akifox.DEG2RAD);
+			var cos = Math.cos(angle * PLIK.DEG2RAD);
+			var sin = Math.sin(angle * PLIK.DEG2RAD);
 			_data[_dataIndex++] = cos * scaleX; // m00
 			_data[_dataIndex++] = -sin * scaleY; // m10
 			_data[_dataIndex++] = sin * scaleX; // m01

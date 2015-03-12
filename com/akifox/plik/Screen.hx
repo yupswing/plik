@@ -1,4 +1,4 @@
-package com.akifox.lib;
+package com.akifox.plik;
 
 import openfl.display.Sprite;
 import openfl.events.Event;
@@ -33,8 +33,8 @@ class Screen extends Sprite implements IDestroyable
 
 	public function new () {
 		super();
-		rwidth = Akifox.resolutionX;
-		rheight = Akifox.resolutionY;
+		rwidth = PLIK.resolutionX;
+		rheight = PLIK.resolutionY;
 	}
 
 	// call at the loading
@@ -47,11 +47,11 @@ class Screen extends Sprite implements IDestroyable
 		removeEventListener(Event.ADDED_TO_STAGE, construct);
 
 		resize();
-		Akifox.sceneReady();
+		PLIK.sceneReady();
 	}
 
 	public override function toString():String {
-		return "[Akifox.Screen]";
+		return "[PLIK.Screen]";
 	}
 
 	private var _dead:Bool=false;
@@ -84,7 +84,7 @@ class Screen extends Sprite implements IDestroyable
 	// the screen is ready
 	public function start():Void {
 		resume();
-		if (paused) pause(); //handle the pause triggered during transitions Akifox
+		if (paused) pause(); //handle the pause triggered during transitions PLIK
 	}
 
 	// the screen is stopped on an hold

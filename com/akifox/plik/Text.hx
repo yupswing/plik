@@ -1,5 +1,5 @@
 
-package com.akifox.lib;
+package com.akifox.plik;
 
 import openfl.text.Font;
 import openfl.text.TextField;
@@ -10,7 +10,7 @@ import openfl.text.AntiAliasType;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 
-import com.akifox.lib.geom.*;
+import com.akifox.plik.geom.*;
 
 // TODO Editing going on to support transformations
 // will be finished when Transform.hx is done
@@ -91,12 +91,12 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
 
 	}
 	private static function set_defaultFont(value:String):String {
-		_defaultFont = Akifox.getFont(value);
+		_defaultFont = PLIK.getFont(value);
 		return _defaultFontName = value;
 	}
 
     public override function toString():String {
-        return '[Akifox.Text "'+text+'"]';
+        return '[PLIK.Text "'+text+'"]';
     }
 
 	public function new (stringText:String="",?size:Int=20,?color:Int=0x000000,?font:String="",?smoothing:Bool=true) {
@@ -108,7 +108,7 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
 	    if (font=="") {
 	    	textFieldFont = _defaultFont;
 	    } else {
-	    	textFieldFont = Akifox.getFont(font);
+	    	textFieldFont = PLIK.getFont(font);
 	    }
 
 

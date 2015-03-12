@@ -25,7 +25,7 @@ import openfl.Lib;
 import openfl.Assets;
 import openfl.display.Sprite;
 
-import Performance; // or com.akifox.lib.debug.Performance
+import Performance; // or com.akifox.plik.debug.Performance
                     // if you use the whole library via haxelib git
 
 class Main extends Sprite
