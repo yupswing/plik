@@ -10,8 +10,10 @@ import openfl.display.StageDisplayState;
 import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
+#if !mobile
 import openfl.events.KeyboardEvent;
 import openfl.ui.Keyboard;
+#end
 import openfl.Lib;
 import openfl.display.DisplayObject;
 import openfl.geom.Point;
@@ -73,8 +75,10 @@ class PLIK
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_OUT,inactive);
 		Lib.current.stage.addEventListener(Event.ACTIVATE,active);
 		Lib.current.stage.addEventListener(Event.DEACTIVATE,inactive);
+		#if !mobile
 		#if debug
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
+		#end
 		#end
 
 
@@ -153,7 +157,8 @@ class PLIK
 			Multitouch.inputMode = MultitouchInputMode.TOUCH_POINT;
 		}
 	}
-
+	
+	#if !mobile
 	#if debug
 	private static function keyUp(event:KeyboardEvent) {
 		if(_currentScene==null) return;
@@ -171,6 +176,7 @@ class PLIK
 			 	trace('--- -END- ---');
 		}
 	}
+	#end
 	#end
 
 	private static function inactive(event:Dynamic):Void {
