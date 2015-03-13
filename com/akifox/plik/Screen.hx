@@ -30,8 +30,6 @@ class Screen extends Sprite implements IDestroyable
 
 	private var resizePow:Bool = false;
 
-	public var paused:Bool = false;
-	public var pausable:Bool = true;
 	private var cycle:Bool = false;
 
 
