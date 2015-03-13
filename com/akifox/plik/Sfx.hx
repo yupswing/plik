@@ -12,6 +12,12 @@ import openfl.Assets;
  */
 class Sfx
 {
+
+	#if flash
+	public static inline var FORMAT = ".mp3";
+	#else
+	public static inline var FORMAT = ".ogg";
+	#end
 	/**
 	 * Optional callback function for when the sound finishes playing.
 	 */
@@ -46,7 +52,7 @@ class Sfx
 				_sound = _sounds[source];
 			} else {
 				//trace('load '+source);
-				_sound = Assets.getSound(source,false);
+				_sound = Assets.getSound(source + FORMAT,false);
 				_sounds.set(source, _sound);
 			}
 		}
