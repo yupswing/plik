@@ -31,6 +31,7 @@ import com.akifox.plik.Screen;
 class PLIK
 {
 
+
 	//##########################################################################################
 	
 	/** Constant factor to pass from degrees to radians **/
@@ -56,8 +57,6 @@ class PLIK
 
 	public static var id:String = "";
 
-	private static var inTransition:Bool = false;
-
 	public static function initialize(screenContainer:DisplayObjectContainer,appid:String):Void {								
 		if (screenContainer != null){
 			_screenContainer = screenContainer;			
@@ -70,13 +69,13 @@ class PLIK
 		//sound init
 		initSfx();
 
-		Lib.current.stage.addEventListener(FocusEvent.FOCUS_IN,focus);
-		Lib.current.stage.addEventListener(FocusEvent.FOCUS_OUT,defocus);
-		Lib.current.stage.addEventListener(Event.ACTIVATE,focus);
-		Lib.current.stage.addEventListener(Event.DEACTIVATE,defocus);
-		//#if !mobile
-		//Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
-		//#end
+		Lib.current.stage.addEventListener(FocusEvent.FOCUS_IN,active);
+		Lib.current.stage.addEventListener(FocusEvent.FOCUS_OUT,inactive);
+		Lib.current.stage.addEventListener(Event.ACTIVATE,active);
+		Lib.current.stage.addEventListener(Event.DEACTIVATE,inactive);
+/*		#if !mobile
+		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
+		#end*/
 
 
 /*		trace(openfl.system.Capabilities.screenResolutionX,'x',
@@ -155,41 +154,25 @@ class PLIK
 		}
 	}
 
-	private static function keyUp(event:KeyboardEvent) {
-/*		if(_currentScene==null) return;
+/*	private static function keyUp(event:KeyboardEvent) {
+		if(_currentScene==null) return;
 		switch (event.keyCode) {
-			case Keyboard.P:
-				if(_currentScene.paused) play();
-				else pause();
+			// case Keyboard.P:
+			// 	if(_currentScene.paused) play();
+			// 	else pause();
 			case Keyboard.F:
 				toggleFullscreen();
 			case Keyboard.M:
 				toggleMusic();
-		}*/
-	}
-
-	public static function pause():Void {
-		if (_currentScene==null) return;
-		if (_currentScene.pausable) {
-			if (inTransition) _currentScene.paused = true; // start() will handle it
-			else _currentScene.pause();
 		}
+	}*/
+
+	private static function inactive(event:Dynamic):Void {
+		hold();
 	}
 
-	public static function play():Void {
-		if (_currentScene==null) return;
-			if (inTransition) _currentScene.paused = false; // start() will handle it
-			else _currentScene.play();
-	}
-
-	private static function focus(event:Dynamic):Void {
-		if (_currentScene==null) return;
-		_currentScene.resume();
-	}
-
-	private static function defocus(event:Dynamic):Void { 
-		if (_currentScene==null) return;
-		_currentScene.hold();
+	private static function active(event:Dynamic):Void { 
+		resume();
 	}
 
 
@@ -198,6 +181,32 @@ class PLIK
 	// SCENE MANAGEMENT
 	//
 	//##########################################################################################
+
+
+
+	private static var _isHold = false;
+	public static var isHold(get,never):Bool;
+	private static function get_isHold():Bool {
+		return _isHold;
+	}
+
+	private static var inTransition:Bool = false;
+
+	public static function hold(){
+		_isHold = true;
+		Actuate.pauseAll();
+		pauseMusic();
+		if (inTransition) return;
+		_currentScene.hold();
+	}
+
+	public static function resume(){
+		_isHold = false;
+		Actuate.resumeAll();
+		resumeMusic();
+		if (inTransition) return;
+		_currentScene.resume();
+	}
 
 	public static inline var _transition_offset = 300; // offset drawing for the ghost
 	public static inline var _transition_span = 250; // distance between slides
@@ -522,6 +531,19 @@ class PLIK
 			_music.stop();
 			_music = null;
 		});
+	}
+
+	public static function pauseMusic() {
+		if (!_musicOn || _music == null) return;
+		_music.stop();
+		if (_musicOut!=null) _musicOut.stop();
+
+	}
+
+	public static function resumeMusic() {
+		if (!_musicOn || _music == null) return;
+		_music.resume();
+		if (_musicOut!=null) _musicOut.resume();
 	}
 
 	public static function prepareMusic(file:String) {

@@ -1,5 +1,7 @@
 package com.akifox.plik;
 
+import haxe.Timer;
+
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.Lib;
@@ -23,6 +25,8 @@ class Screen extends Sprite implements IDestroyable
 	public var currentScale:Float = 1;
 	public var rwidth:Float = 1;
 	public var rheight:Float = 1;
+
+	public var title:String = "Screen";
 
 	private var resizePow:Bool = false;
 
@@ -51,7 +55,7 @@ class Screen extends Sprite implements IDestroyable
 	}
 
 	public override function toString():String {
-		return "[PLIK.Screen]";
+		return "[PLIK.Screen \""+title+"\"]";
 	}
 
 	private var _dead:Bool=false;
@@ -79,38 +83,36 @@ class Screen extends Sprite implements IDestroyable
 	}
 
 	// call at the unloading
-	public function unload():Void { }
+	public function unload():Void {
 
-	// the screen is ready
+	}
+
+	// the screen is ready (called by PLIK)
 	public function start():Void {
 		resume();
-		if (paused) pause(); //handle the pause triggered during transitions PLIK
 	}
 
-	// the screen is stopped on an hold
-	public function hold():Void { }
-
-	// the screen is ready after an hold
-	public function resume():Void { }
-
-	public function play():Void {
-		if (!paused) return; //no double play
-		paused = false;
-		if (cycle) Lib.current.stage.addEventListener(Event.ENTER_FRAME, onUpdate);
-		Actuate.resumeAll();
-	}
-
-	public function pause():Void {
-		if (paused) return; //no double pause
+	// the screen is stopped on an hold (called by PLIK)
+	public function hold():Void {
+		//trace('hold'+this);
 		if (cycle) Lib.current.stage.removeEventListener(Event.ENTER_FRAME, onUpdate);
-		Actuate.pauseAll();
-		paused = true;
 	}
+
+	// the screen is ready after an hold (called by PLIK)
+	public function resume():Void {
+		//trace('resume'+this);
+		_time = Timer.stamp();
+		if (cycle) Lib.current.stage.addEventListener(Event.ENTER_FRAME, onUpdate);
+	}
+
+	private var _time:Float = 0;
 
 	private function onUpdate(event:Event) {
-		update();
+		var now:Float = Timer.stamp();
+		update(now-_time);
+		_time = now;
 	}
-	private function update():Void { }
+	private function update(delta:Float):Void { }
 
 	public function resize():Void {
 		//resizePow = true;
