@@ -110,7 +110,7 @@ class PLIK
 	private static function get_resolutionY():Float{
 		return resolution[1];
 	}
-	private static inline var _ratio:Float = 16/9;
+	private static var _ratio:Float = 16/9; //default ratio
 
 	private static var _pointFactor:Float = 1;
 	public static var pointFactor(get, never):Float;
@@ -118,8 +118,11 @@ class PLIK
 		return _pointFactor;
 	}
 
-	public static function setResolution(){
+	public static function setResolution(width:Int=0,ratio:Int=0){
+		if (ratio>0) _ratio = ratio;
 		var w:Float = realresolution[0];
+		if (width>0) w=width;
+
 		#if !ios
 		if (w > 1920) { //2560
 				resolution = [2560,2560/_ratio];

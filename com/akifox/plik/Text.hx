@@ -15,7 +15,7 @@ import com.akifox.plik.geom.*;
 // TODO Editing going on to support transformations
 // will be finished when Transform.hx is done
 
-#if (flash || next || debug)
+#if (flash || next)
 // this class it's a TextField
 // Flash renders the TextField beautifully and it doesn't need any trick
 class Text extends TextField implements ITransformable implements IDestroyable
@@ -33,7 +33,7 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
 	var textFieldFormat:TextFormat;
 	var textFieldSize:Int;
 
- 	#if (!flash && !next && !debug)
+ 	#if (!flash && !next)
  	// make the use of .text the same in every target
  	var textFieldBitmapData:BitmapData;
  	
@@ -70,12 +70,12 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
 	}
 	#else
 
-	//public override var text(get, set):String;
-	override function get_text():String {
+	public override var text(get, set):String;
+	function get_text():String {
 	  return super.text;
 	}
 
-	override function set_text(value:String) {
+	function set_text(value:String) {
 	    super.text = value;
 	    if (_transformation != null) _transformation.updateSize();
 	    return value;
@@ -112,7 +112,7 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
 	    }
 
 
- 		#if (flash || next || debug)
+ 		#if (flash || next)
 		    // this class it's actually a TextField
 		    textField = this;
 	    #else
@@ -246,7 +246,7 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
     	this._transformation.destroy();
     	this._transformation = null;
 
-	 	#if (!flash && !next && !debug)
+	 	#if (!flash && !next)
 		bitmapData = null;
 	 	textFieldBitmapData.dispose();
 	 	textFieldBitmapData = null;
