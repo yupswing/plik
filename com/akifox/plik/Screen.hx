@@ -42,12 +42,10 @@ class Screen extends Sprite implements IDestroyable
 	// call at the loading
 	public function initialize():Void {
 		addEventListener(Event.ADDED_TO_STAGE, construct);
-		if (cycle) Lib.current.stage.addEventListener(Event.ENTER_FRAME, onUpdate);
 	}
 
 	public function construct(event:Event) {
 		removeEventListener(Event.ADDED_TO_STAGE, construct);
-
 		resize();
 		PLIK.sceneReady();
 	}
@@ -61,6 +59,7 @@ class Screen extends Sprite implements IDestroyable
     public function get_dead():Bool { return _dead; }
 
 	public function destroy():Void {
+		//trace('destroy ' + this);
 		_dead = true;
         motion.Actuate.tween(this,0,{});
         motion.Actuate.stop(this);
@@ -82,11 +81,12 @@ class Screen extends Sprite implements IDestroyable
 
 	// call at the unloading
 	public function unload():Void {
-
+		//trace('unload'+this);
 	}
 
 	// the screen is ready (called by PLIK)
 	public function start():Void {
+		//trace('start'+this);
 		resume();
 	}
 

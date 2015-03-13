@@ -73,9 +73,9 @@ class PLIK
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_OUT,inactive);
 		Lib.current.stage.addEventListener(Event.ACTIVATE,active);
 		Lib.current.stage.addEventListener(Event.DEACTIVATE,inactive);
-/*		#if !mobile
+		#if debug
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
-		#end*/
+		#end
 
 
 /*		trace(openfl.system.Capabilities.screenResolutionX,'x',
@@ -154,18 +154,24 @@ class PLIK
 		}
 	}
 
-/*	private static function keyUp(event:KeyboardEvent) {
+	#if debug
+	private static function keyUp(event:KeyboardEvent) {
 		if(_currentScene==null) return;
 		switch (event.keyCode) {
 			// case Keyboard.P:
 			// 	if(_currentScene.paused) play();
 			// 	else pause();
-			case Keyboard.F:
-				toggleFullscreen();
-			case Keyboard.M:
-				toggleMusic();
+			// case Keyboard.F:
+			// 	toggleFullscreen();
+			// case Keyboard.M:
+			// 	toggleMusic();
+			case Keyboard.D:
+			 	trace('--- DEBUG ---');
+			 	// other debug here
+			 	trace('--- -END- ---');
 		}
-	}*/
+	}
+	#end
 
 	private static function inactive(event:Dynamic):Void {
 		hold();
@@ -196,7 +202,6 @@ class PLIK
 		_isHold = true;
 		Actuate.pauseAll();
 		pauseMusic();
-		if (inTransition) return;
 		_currentScene.hold();
 	}
 
@@ -204,7 +209,6 @@ class PLIK
 		_isHold = false;
 		Actuate.resumeAll();
 		resumeMusic();
-		if (inTransition) return;
 		_currentScene.resume();
 	}
 
@@ -240,7 +244,7 @@ class PLIK
 	}
 
 	public static function hasHoldScene():Bool {
-		return !(_holdScene==null);
+		return (_holdScene!=null);
 	}
 
 	public static function getHoldScene():Dynamic {
@@ -285,6 +289,17 @@ class PLIK
 	
 	private static function loadScreen(?newScreen:Screen=null,?transition:String="",?modal:Bool=false):Void {
 		
+
+		if (inTransition) {
+			//it is currently in transition
+			// need to be stopped and destroyed
+			// STOP will trigger the endTransition
+			Actuate.stop(_currentScene);
+			Actuate.stop(_oldScene);
+		}
+
+		_isSceneOnHold = false;
+		//_makeSceneOnHold = false;
 		// newScreen == null && modal = false    -->  get hold screen
 		// newScreen == screen && modal = true   -->  make hold screen
 		// newScreen == screen && modal = false  -->  change screen
@@ -293,7 +308,6 @@ class PLIK
 
 		var isResume = (newScreen==null && modal == false);
 		var isMakeHold = (newScreen!=null && modal == true);
-
 		//if (_holdScene==null && !isMakeHold) Actuate.reset(); //TODO to be reactivated???
 
 		if (_screenContainer != null) {
@@ -315,12 +329,7 @@ class PLIK
 					destroyHold();
 					_holdScene = _currentScene;
 					_makeSceneOnHold = true;
-				}// else {
-					//trace('1. not modal destroy scene');
-					//if (_holdScene!=null && newScreen!=null) {
-						//trace('1.5 not modal destroyhold');
-					//}
-				//}
+				}
 				_oldScene = _currentScene;
 				_currentScene = null;
 			}
@@ -355,17 +364,29 @@ class PLIK
 		}
 	}
 
+	private static function startScene():Void {
+		if (_isSceneOnHold) {
+			_currentScene.resume();
+		} else {
+			_currentScene.start();
+		}
+	}
+
 
 	public static function sceneReady():Void {
-		//trace('3. scene ready');
+
+		var timing = 1;
+		var delay = 0;
+
 
 		if (_transition_mode == TRANSITION_NONE) {
-			sceneStart();
+			Actuate.timer(0.1).onComplete(startScene);
+			endTransition();
 			return;
 		}
 
-		var timing = 1;
-		var delay = 0;//#if mobile 0.2 #else 0 #end; //ios needs bit of delay
+		//trace('3. scene ready');
+		Actuate.timer(0.1).onComplete(startScene);
 
 		var ghostEase = Sine.easeIn;
 		var sceneEase = Expo.easeOut;
@@ -385,59 +406,46 @@ class PLIK
 			case TRANSITION_ALPHA:
 				_currentScene.alpha = 0;
 				if (_oldScene!=null) Actuate.tween (_oldScene, timing, { alpha: 0 }).delay(delay);
-				Actuate.tween (_currentScene, timing, { alpha: 1 }).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_currentScene, timing, { alpha: 1 }).delay(delay).onComplete(endTransition);
 			case TRANSITION_SLIDE_UP:
 				_currentScene.y += currentHeight+_transition_span;
 				if (_oldScene!=null) {
 					Actuate.tween (_oldScene, timing, { y: oldY-currentHeight-_transition_span }).ease(ghostEase).delay(delay);
 					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
 				}
-				Actuate.tween (_currentScene, timing, { y: baseY }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_currentScene, timing, { y: baseY }).ease(sceneEase).delay(delay).onComplete(endTransition);
 			case TRANSITION_SLIDE_DOWN:
 				_currentScene.y -= currentHeight+_transition_span;
 				if (_oldScene!=null) {
 					Actuate.tween (_oldScene, timing, { y: oldY+currentHeight+_transition_span }).ease(ghostEase).delay(delay);
 					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
 				}
-				Actuate.tween (_currentScene, timing, { y: baseY }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_currentScene, timing, { y: baseY }).ease(sceneEase).delay(delay).onComplete(endTransition);
 			case TRANSITION_SLIDE_LEFT:
 				_currentScene.x += currentWidth+_transition_span;
 				if (_oldScene!=null) {
 					Actuate.tween (_oldScene, timing, { x: oldX-currentWidth-_transition_span }).ease(ghostEase).delay(delay);
 					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
 				}
-				Actuate.tween (_currentScene, timing, { x: baseX }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_currentScene, timing, { x: baseX }).ease(sceneEase).delay(delay).onComplete(endTransition);
 			case TRANSITION_SLIDE_RIGHT:
 				_currentScene.x -= currentWidth+_transition_span;
 				if (_oldScene!=null) {
 					Actuate.tween (_oldScene, timing, { x: oldX+currentWidth+_transition_span }).ease(ghostEase).delay(delay);	
 					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
 				}
-				Actuate.tween (_currentScene, timing, { x: baseX }).ease(sceneEase).delay(delay).onComplete(sceneStart);
+				Actuate.tween (_currentScene, timing, { x: baseX }).ease(sceneEase).delay(delay).onComplete(endTransition);
 		}
 	}
 
-	private static function sceneStart():Void {
+	private static function endTransition():Void {
 		if (_makeSceneOnHold) {
 			_oldScene = null;
-		}else{
+		} else {
 			destroyScene(_oldScene);
 		}
 		inTransition = false;
-
-		if (_isSceneOnHold) {
-			sceneContinue();
-			return;
-		}
-		//trace('4. scene start');
-		_currentScene.start();
 		_makeSceneOnHold = false;
-	}
-
-	private static function sceneContinue():Void {
-		//trace('4. scene continue');
-		_currentScene.resume();
-		_isSceneOnHold = false;
 	}
 
 
