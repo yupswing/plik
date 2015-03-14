@@ -61,8 +61,7 @@ class Screen extends Sprite implements IDestroyable
 	public function destroy():Void {
 		//trace('destroy ' + this);
 		_dead = true;
-        motion.Actuate.tween(this,0,{});
-        motion.Actuate.stop(this);
+        //motion.Actuate.stop(this);
 
 		if (numChildren != 0) {
 			var i:Int = numChildren;	

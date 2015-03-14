@@ -128,6 +128,7 @@ class Gfx extends Bitmap implements ITransformable implements IDestroyable {
 
     public function destroy() {
         _dead = true;
+        //motion.Actuate.stop(this);
 
         #if gbcheck
         trace('AKIFOX Destroy ' + this);

@@ -235,8 +235,7 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
 
     public function destroy() {
 	 	_dead = true;
-        motion.Actuate.tween(this,0,{});
-        motion.Actuate.stop(this);
+        //motion.Actuate.stop(this);
 
         #if gbcheck
         trace('AKIFOX Destroy ' + this);
