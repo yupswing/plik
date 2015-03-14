@@ -447,6 +447,7 @@ class PLIK
 
 	private static function endTransition():Void {
 		if (_makeSceneOnHold) {
+			_screenContainer.removeChild(_oldScene);
 			_oldScene = null;
 		} else {
 			destroyScene(_oldScene);
