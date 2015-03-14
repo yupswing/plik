@@ -162,6 +162,7 @@ class Gfx extends Bitmap implements ITransformable implements IDestroyable {
 	}
 
 	public static function preloadBitmap(name:String):Void {
+        if (_bitmapCache.exists(name)) return;
 		var data:BitmapData = openfl.Assets.getBitmapData(bitmapPath(name), false);
 		if (data != null) _bitmapCache.set(name, data);
 		data = null;

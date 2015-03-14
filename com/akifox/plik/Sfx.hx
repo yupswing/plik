@@ -369,6 +369,13 @@ class Sfx
 		return false;
 	}
 
+	static public function preloadSound(name:String):Void {
+        if (_sounds.exists(name)) return;
+        var data:Sound = Assets.getSound(name + FORMAT,false);
+		if (data != null) _sounds.set(name, data);
+		data = null;
+	}
+
 	// Sound infromation.
 	private var _type:String;
 	private var _volume:Float = 1;

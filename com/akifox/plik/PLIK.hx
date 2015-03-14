@@ -103,8 +103,8 @@ class PLIK
 	//
 	//##########################################################################################
 
-	private static var realresolution = [0.0,0.0];
-	private static var resolution = [0.0,0.0];
+	private static var resolution:Array<Float> = [0,0];
+	private static var realresolution:Array<Float> = [0,0];
 	public static var resolutionX(get,never):Float;
 	private static function get_resolutionX():Float{
 		return resolution[0];
@@ -212,6 +212,7 @@ class PLIK
 	}
 
 	public static function resume(){
+		if (_currentScene==null) return;
 		_isHold = false;
 		Actuate.resumeAll();
 		resumeMusic();
@@ -469,15 +470,18 @@ class PLIK
 
 	public static function getFont(name:String):Font
 	{
-		if (_font.exists(name))
-			return _font.get(name);
-
-		var data:Font = openfl.Assets.getFont(name, false);
-
-		if (data != null)
-			_font.set(name, data);
-
+		if (_font.exists(name)) return _font.get(name);
+		var data:Font = openfl.Assets.getFont(name, false); 
+		if (data != null) _font.set(name, data); 
 		return data;
+	}
+
+	public static function preloadFont(name:String):Void
+	{
+		if (_font.exists(name)) return;
+		var data:Font = openfl.Assets.getFont(name, false);
+		if (data != null) _font.set(name, data);
+		data = null;
 	}
 
 	public static function removeFont(name:String):Bool
