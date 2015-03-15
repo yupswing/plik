@@ -57,7 +57,7 @@ class PLIK
 	//##########################################################################################
 
 
-	public static var id:String = "";
+	public static var APPID:String = "";
 
 	public static function initialize(screenContainer:DisplayObjectContainer,appid:String):Void {								
 		if (screenContainer != null){
@@ -65,7 +65,8 @@ class PLIK
 		} else {
 			throw new Error("AKIFOX Error: Cannot initialize screen container. The value is null.");
 		}
-		id = appid;
+		APPID = appid;
+		Data.setId(APPID);
 		_transition_mode = TRANSITION_NONE;
 
 		//sound init

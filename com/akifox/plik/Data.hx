@@ -74,18 +74,17 @@ class Data
 		data.data.write(name,value);
 	}
 
+	private static var dataId:String = "";
+
+	public static function setId(id:String) {
+		dataId = id;
+	}
+
 	/////////////////////////////////////////////////////////////////////////
 
-
-
-	/**
-	 * If you want to share data between different SWFs on the same host, use this id.
-	 */
-	private var id:String = "";
 	private var file:String = "";
 
-	public function new(file:String="",?id:String="") {
-		this.id = id;
+	public function new(file:String="") {
 		this.file = file;
 		load();
 	}
@@ -181,15 +180,14 @@ class Data
 	private function loadD():Dynamic
 	{
 		if (file == null) file = DEFAULT_FILE;
-		if (id != "") _shared = SharedObject.getLocal(PREFIX + "/" + id + "/" + file, "/");
-		else _shared = SharedObject.getLocal(PREFIX + "/" + file);
+		if (dataId != "") _shared = SharedObject.getLocal(dataId + "/" + file, "/");
+		else _shared = SharedObject.getLocal(file);
 		return _shared.data;
 	}
 
 	// Data information.
 	private var _shared:SharedObject;
 	private var _data:Map<String,Dynamic> = new Map<String,Dynamic>();
-	private static inline var PREFIX:String = "PLIK";
 	private static inline var DEFAULT_FILE:String = "_default";
 	private static inline var SIZE:Int = 10000;
 }
