@@ -5,6 +5,7 @@ interface ITransformable
 {
     private var _transformation:Transformation;
 
+    public function updateTransformation():Void;
     private function initTransformation():Void;
     public function setAnchoredPivot(value:Int):Void;
     public function setPivot(x:Float,y:Float):Void;

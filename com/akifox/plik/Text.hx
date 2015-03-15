@@ -144,6 +144,10 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
     //## INTERFACE
     private var _transformation:Transformation;
 
+    public function updateTransformation() {
+    	_transformation.updateSize();
+    }
+
     private function initTransformation() {
     	_transformation = new Transformation(this);
     }
