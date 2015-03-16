@@ -7,7 +7,7 @@ interface IDestroyable {
 
 	public function destroy():Void;
 
-	private var _dead:Bool=false;
+	private var _dead:Bool;
 	public var dead(get,never):Bool;
     public function get_dead():Bool;
 

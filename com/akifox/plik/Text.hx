@@ -10,21 +10,22 @@ import openfl.text.AntiAliasType;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 
-import com.akifox.plik.geom.*;
+import com.akifox.plik.geom.Transformation;
 
 // TODO Editing going on to support transformations
 // will be finished when Transform.hx is done
 
-#if (flash || next)
+#if (flash)
+import openfl.events.Event;
 // this class it's a TextField
 // Flash renders the TextField beautifully and it doesn't need any trick
-class Text extends TextField implements ITransformable implements IDestroyable
+class Text extends TextField implements IDestroyable
 #else
 // this class is a Bitmap encapsulating a TextField
 // the TextField will be drawn every time it changes (now only .text)
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
-class Text extends Bitmap implements ITransformable implements IDestroyable
+class Text extends Bitmap implements IDestroyable
 #end
 {
 	var textField:TextField;
@@ -33,7 +34,7 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
 	var textFieldFormat:TextFormat;
 	var textFieldSize:Int;
 
- 	#if (!flash && !next)
+ 	#if (!flash)
  	// make the use of .text the same in every target
  	var textFieldBitmapData:BitmapData;
  	
@@ -70,16 +71,10 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
 	}
 	#else
 
-	public override var text(get, set):String;
-	function get_text():String {
-	  return super.text;
-	}
-
-	function set_text(value:String) {
-	    super.text = value;
-	    if (_transformation != null) _transformation.updateSize();
-	    return value;
-	}
+    private function onChange(e:Event) {
+        trace('change'+this);
+        if (_transformation != null) _transformation.updateSize();
+    }
 
 	#end
 
@@ -95,13 +90,14 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
 		return _defaultFontName = value;
 	}
 
-    public override function toString():String {
-        return '[PLIK.Text "'+text+'"]';
-    }
-
 	public function new (stringText:String="",?size:Int=20,?color:Int=0x000000,?font:String="",?smoothing:Bool=true) {
 		
 		super ();
+        _dead = false;
+        
+        #if flash
+        addEventListener(Event.CHANGE, onChange);
+        #end
 
 	    textFieldSize = size;
 	    textFieldColor = color;
@@ -112,7 +108,7 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
 	    }
 
 
- 		#if (flash || next)
+ 		#if (flash)
 		    // this class it's actually a TextField
 		    textField = this;
 	    #else
@@ -135,102 +131,22 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
 	    textField.border = false;
 		text = stringText;
 
-    	initTransformation(); //before set_test
+        _transformation = new Transformation(this.transform.matrix,this.width,this.height);
+        _transformation.bind(this);
 
 	}
-
-	//###############
-
-    //## INTERFACE
+    
     private var _transformation:Transformation;
-
-    public function updateTransformation() {
-    	_transformation.updateSize();
+    public var t(get,never):Transformation;
+    private function get_t():Transformation {
+        return _transformation;
     }
 
-    private function initTransformation() {
-    	_transformation = new Transformation(this);
-    }
+    //##########################################################################################
+    // IDestroyable
 
-    public function setAnchoredPivot(value:Int){
-    	_transformation.setAnchoredPivot(value);
-    }
-
-    public function setPivot(x:Float,y:Float){
-    	_transformation.setPivot(new Point(x,y));
-    }
-
-    public function flipX():Void {
-    	_transformation.flipX();
-    }
-    public function flipY():Void{
-    	_transformation.flipY();
-    }
-
-    public var scale(get,set):Float;
-    private function get_scale():Float{
-    	return _transformation.scalingX;
-    }
-    private function set_scale(value:Float):Float{
-    	_transformation.setScale(value); //x and y
-    	return value;
-    }
-
-    private override function get_scaleX():Float{
-    	return _transformation.scalingX;
-    }
-    private override function set_scaleX(value:Float):Float{ 
-    	return _transformation.scalingX = value;
-    }
-
-    private override function get_scaleY():Float{
-    	return _transformation.scalingY;
-    }
-    private override function set_scaleY(value:Float):Float{ 
-    	return _transformation.scalingY = value;
-    }
-
-    public var skewX(get,set):Float;
-    private function get_skewX():Float{
-    	return _transformation.skewingX;
-    }
-    private function set_skewX(value:Float):Float{ 
-    	return _transformation.skewingX = value;
-    }
-
-    public var skewY(get,set):Float;
-    private function get_skewY():Float{
-    	return _transformation.skewingY;
-    }
-    private function set_skewY(value:Float):Float{ 
-    	return _transformation.skewingY = value;
-    }
-
-    //public override var rotation(get,set):Float;
-    private override function get_rotation():Float{
-    	return _transformation.rotation;
-    }
-    private override function set_rotation(value:Float):Float{
-    	_transformation.rotation = value;
-    	return value;
-    }
-
-    //public override var x(get,set):Float;
-    private override function get_x():Float{
-    	return _transformation.translationX;
-    }
-    private override function set_x(value:Float):Float{
-    	_transformation.translationX = value;
-    	return value;
-    }
-
-    //public override var y(get,set):Float;
-    private override function get_y():Float{
-    	return _transformation.translationY;
-    }
-    private override function set_y(value:Float):Float{
-    	_transformation.translationY = value;
-    	return value;
+    public override function toString():String {
+        return '[PLIK.Text "'+text+'"]';
     }
 	
 	private var _dead:Bool=false;
@@ -249,10 +165,12 @@ class Text extends Bitmap implements ITransformable implements IDestroyable
     	this._transformation.destroy();
     	this._transformation = null;
 
-	 	#if (!flash && !next)
+	 	#if (!flash)
 		bitmapData = null;
 	 	textFieldBitmapData.dispose();
 	 	textFieldBitmapData = null;
+        #else
+        removeEventListener(Event.CHANGE, onChange);
 	 	#end
     }
 	

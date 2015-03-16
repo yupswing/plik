@@ -206,6 +206,7 @@ class PLIK
 	private static var inTransition:Bool = false;
 
 	public static function hold(){
+		if (_currentScene==null) return;
 		_isHold = true;
 		Actuate.pauseAll();
 		pauseMusic();

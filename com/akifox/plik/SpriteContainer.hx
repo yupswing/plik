@@ -1,12 +1,29 @@
 
 package com.akifox.plik;
 import openfl.display.Sprite;
+import com.akifox.plik.geom.Transformation;
 
 class SpriteContainer extends Sprite implements IDestroyable {
 
+	private var _transformation:Transformation;
+    public var t(get,never):Transformation;
+    private function get_t():Transformation {
+        return _transformation;
+    }
+
 	public function new() {
+    	_dead = false;
 		super();
+        _transformation = new Transformation(this.transform.matrix,this.width,this.height);
+        _transformation.bind(this);
 	}
+
+    public function updateTransformation() {
+        _transformation.updateSize(this.width,this.height);
+    }
+
+    //##########################################################################################
+    // IDestroyable
 
 	public override function toString():String {
 		return "[PLIK.SpriteContainer <"+numChildren+" Elements>]";
@@ -20,6 +37,16 @@ class SpriteContainer extends Sprite implements IDestroyable {
         #if gbcheck
         trace('AKIFOX Destroy ' + this);
         #end
-        _dead = true;
+        _dead = true;    	
+
+        if (numChildren != 0) {
+			var i:Int = numChildren;	
+			var child:Dynamic;
+			do {
+				i--;
+				child = getChildAt(i);
+				removeChildAt(i);						
+			} while (i > 0);
+		}
 	}
 }
