@@ -15,7 +15,7 @@ import com.akifox.plik.geom.Transformation;
 // TODO Editing going on to support transformations
 // will be finished when Transform.hx is done
 
-#if (flash)
+#if (flash || next)
 import openfl.events.Event;
 // this class it's a TextField
 // Flash renders the TextField beautifully and it doesn't need any trick
@@ -34,7 +34,7 @@ class Text extends Bitmap implements IDestroyable
 	var textFieldFormat:TextFormat;
 	var textFieldSize:Int;
 
- 	#if (!flash)
+ 	#if (!flash && !next)
  	// make the use of .text the same in every target
  	var textFieldBitmapData:BitmapData;
  	
@@ -109,7 +109,7 @@ class Text extends Bitmap implements IDestroyable
 	    }
 
 
- 		#if (flash)
+ 		#if (flash || next)
 		    // this class it's actually a TextField
 		    textField = this;
 	    #else
@@ -166,7 +166,7 @@ class Text extends Bitmap implements IDestroyable
     	this._transformation.destroy();
     	this._transformation = null;
 
-	 	#if (!flash)
+	 	#if (!flash && !next)
 		bitmapData = null;
 	 	textFieldBitmapData.dispose();
 	 	textFieldBitmapData = null;
