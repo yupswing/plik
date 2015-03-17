@@ -126,13 +126,13 @@ class Transformation extends EventDispatcher
     	this.identity();
 
     	// get the _identity width and height without transformations
-/*    	if (nw==0 || nh==0) {
-	    	_identityWidth = target.width;
-	    	_identityHeight = target.height;
-	    } else {*/
+    	if ((nw==0 || nh==0)&&(_target != null)) {
+	    	_identityWidth = _target.width;
+	    	_identityHeight = _target.height;
+	    } else {
 	    	_identityWidth = nw;
 	    	_identityHeight = nh;
-	    //}
+	    }
 
     	// reset the anchored pivot (based on new size)
     	if (this.pivotPointAnchor!=-1) setAnchoredPivot(this.pivotPointAnchor);

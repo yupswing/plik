@@ -72,10 +72,13 @@ class PLIK
 		//sound init
 		initSfx();
 
+		#if !flash
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_IN,active);
 		Lib.current.stage.addEventListener(FocusEvent.FOCUS_OUT,inactive);
 		Lib.current.stage.addEventListener(Event.ACTIVATE,active);
 		Lib.current.stage.addEventListener(Event.DEACTIVATE,inactive);
+		#end
+
 		#if !mobile
 		#if debug
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP,keyUp);
@@ -271,7 +274,8 @@ class PLIK
     	#end
 		scene.unload();
 		scene.destroy();
-		_screenContainer.removeChild(scene);
+		if (_screenContainer.contains(scene))
+			_screenContainer.removeChild(scene);
 		scene = null;
     	#if gbcheck
     	trace('AKIFOX ---------- scene removed ---------------');
@@ -297,7 +301,6 @@ class PLIK
 	}
 	
 	private static function loadScreen(?newScreen:Screen=null,?transition:String="",?modal:Bool=false):Void {
-		
 
 		if (inTransition) {
 			//it is currently in transition
@@ -318,6 +321,8 @@ class PLIK
 		var isResume = (newScreen==null && modal == false);
 		var isMakeHold = (newScreen!=null && modal == true);
 		//if (_holdScene==null && !isMakeHold) Actuate.reset(); //TODO to be reactivated???
+
+		//trace('RESUME:',isResume,'MAKEHOLD:',isMakeHold);
 
 		if (_screenContainer != null) {
 
@@ -361,15 +366,16 @@ class PLIK
 				_currentScene.resize(); //reset the x,y
 				_holdScene = null;
 				_isSceneOnHold = true;
+				_screenContainer.addChild(_currentScene); //add the next screen on stage
 				sceneReady(); //launch manually
 			} else {
 				//trace('2. get new screen');
 				newScreen.initialize();
 				_currentScene = newScreen;
 				newScreen = null;
+				_screenContainer.addChild(_currentScene); //add the next screen on stage
 				// sceneReady(); will be launch automatically by the newScreen
 			}
-			_screenContainer.addChild(_currentScene); //add the next screen on stage
 		}
 	}
 
@@ -386,6 +392,7 @@ class PLIK
 
 		var timing = 1;
 		var delay = 0;
+		//_transition_mode = TRANSITION_ALPHA;
 
 
 		if (_transition_mode == TRANSITION_NONE) {
@@ -401,6 +408,7 @@ class PLIK
 		var sceneEase = Expo.easeOut;
 
 		_currentScene.alpha = 1; //reset the alpha
+		_currentScene.visible = true; //FLASH set visible to false when alpha = 0
 
 		var baseX = _currentScene.x;
 		var baseY = _currentScene.y;
@@ -449,7 +457,7 @@ class PLIK
 
 	private static function endTransition():Void {
 		if (_makeSceneOnHold) {
-			_screenContainer.removeChild(_oldScene);
+			if (_screenContainer.contains(_oldScene)) _screenContainer.removeChild(_oldScene);
 			_oldScene = null;
 		} else {
 			destroyScene(_oldScene);

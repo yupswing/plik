@@ -69,10 +69,15 @@ class Text extends Bitmap implements IDestroyable
 	    if (_transformation != null) _transformation.updateSize(nw,nh);
 	    return value;
 	}
+
+    public function setText(value:String) {
+        set_text(value);
+    }
+
 	#else
 
-    private function onChange(e:Event) {
-        trace('change'+this);
+    public function setText(value:String) {
+        this.text = value;
         if (_transformation != null) _transformation.updateSize();
     }
 
@@ -94,10 +99,6 @@ class Text extends Bitmap implements IDestroyable
 		
 		super ();
         _dead = false;
-        
-        #if flash
-        addEventListener(Event.CHANGE, onChange);
-        #end
 
 	    textFieldSize = size;
 	    textFieldColor = color;
@@ -169,8 +170,6 @@ class Text extends Bitmap implements IDestroyable
 		bitmapData = null;
 	 	textFieldBitmapData.dispose();
 	 	textFieldBitmapData = null;
-        #else
-        removeEventListener(Event.CHANGE, onChange);
 	 	#end
     }
 	
