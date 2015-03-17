@@ -32,6 +32,8 @@ class Screen extends Sprite implements IDestroyable
 
 	private var cycle:Bool = false;
 
+	public var holdable:Bool = false;
+
 
 	public function new () {
 		super();

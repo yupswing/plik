@@ -297,7 +297,7 @@ class PLIK
 	public static function destroyHold(){
 		if (_holdScene==null) return;
 		destroyScene(_holdScene);
-		_holdScene==null;
+		_holdScene=null;
 	}
 	
 	private static function loadScreen(?newScreen:Screen=null,?transition:String="",?modal:Bool=false):Void {
@@ -320,9 +320,22 @@ class PLIK
 
 		var isResume = (newScreen==null && modal == false);
 		var isMakeHold = (newScreen!=null && modal == true);
+		if (!isResume && !isMakeHold) {
+			//normal load screen
+			if (newScreen.holdable) {
+				// if the new screen is holdable destroy 
+				// any possible currently holded screen
+				destroyHold();
+			}
+
+		}
 		//if (_holdScene==null && !isMakeHold) Actuate.reset(); //TODO to be reactivated???
 
-		//trace('RESUME:',isResume,'MAKEHOLD:',isMakeHold);
+/*		#if debug
+		if (isResume) trace('> RESUME');
+		if (isMakeHold) trace('> MAKE HOLD');
+		if (!isResume && !isMakeHold) trace('> LOAD ' + newScreen);
+		#end*/
 
 		if (_screenContainer != null) {
 
@@ -340,7 +353,7 @@ class PLIK
 				
 				if (isMakeHold) {
 					//trace('1. modal hold scene');
-					destroyHold();
+					//destroyHold();
 					_holdScene = _currentScene;
 					_makeSceneOnHold = true;
 				}
@@ -458,12 +471,15 @@ class PLIK
 	private static function endTransition():Void {
 		if (_makeSceneOnHold) {
 			if (_screenContainer.contains(_oldScene)) _screenContainer.removeChild(_oldScene);
-			_oldScene = null;
 		} else {
 			destroyScene(_oldScene);
 		}
+		_oldScene = null;
 		inTransition = false;
 		_makeSceneOnHold = false;
+/*		#if debug
+		trace('CURRENT:',_currentScene,'HOLD:',_holdScene,'OLD:',_oldScene);
+		#end*/
 	}
 
 
