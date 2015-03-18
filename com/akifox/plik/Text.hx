@@ -35,53 +35,64 @@ class Text extends Bitmap implements IDestroyable
 	var textFieldSize:Int;
 
  	#if (!flash && !next)
- 	// make the use of .text the same in every target
- 	var textFieldBitmapData:BitmapData;
- 	
-	public var text(get, set):String;
 
-	function get_text():String {
-	  return textField.text;
-	}
+	 	// make the use of .text the same in every target
+	 	var textFieldBitmapData:BitmapData;
+	 	
+		public var text(get, set):String;
 
-	function set_text(value:String):String {
-	    textField.text = value;
-		var nw = Std.int(textField.textWidth);
-		var nh = Std.int(textField.textHeight);
-		bitmapData = null;
+		function get_text():String {
+		  return textField.text;
+		}
+		function set_text(value:String):String {
+		  return setText(value);
+		}
 
-		if (textFieldBitmapData != null) {
-			if (nw <= textFieldBitmapData.width && nh <= textFieldBitmapData.height) {
-				// inside the old rect
-				textFieldBitmapData.fillRect(new Rectangle(0,0,textFieldBitmapData.width,textFieldBitmapData.height), 0x00000000);
-			} else {
-				// bigger
-				textFieldBitmapData.dispose();
-				textFieldBitmapData = null;
-	 	    	textFieldBitmapData = new BitmapData(nw, nh, true, 0x000000);
-			}
-	 	} else {
-	 	    textFieldBitmapData = new BitmapData(nw, nh, true, 0x000000);
-	 	}
-    	textFieldBitmapData.draw(textField);
+		function redraw() {
+			var nw = Std.int(textField.textWidth);
+			var nh = Std.int(textField.textHeight);
+			bitmapData = null;
 
-    	bitmapData = textFieldBitmapData;
-	    if (_transformation != null) _transformation.updateSize(nw,nh);
-	    return value;
-	}
+			if (textFieldBitmapData != null) {
+				if (nw <= textFieldBitmapData.width && nh <= textFieldBitmapData.height) {
+					// inside the old rect
+					textFieldBitmapData.fillRect(new Rectangle(0,0,textFieldBitmapData.width,textFieldBitmapData.height), 0x00000000);
+				} else {
+					// bigger
+					textFieldBitmapData.dispose();
+					textFieldBitmapData = null;
+		 	    	textFieldBitmapData = new BitmapData(nw, nh, true, 0x000000);
+				}
+		 	} else {
+		 	    textFieldBitmapData = new BitmapData(nw, nh, true, 0x000000);
+		 	}
+	    	textFieldBitmapData.draw(textField);
 
-    public function setText(value:String) {
-        set_text(value);
-    }
+	    	bitmapData = textFieldBitmapData;
+		    if (_transformation != null) _transformation.updateSize(nw,nh);
+		}
 
 	#else
 
-    public function setText(value:String) {
-        this.text = value;
-        if (_transformation != null) _transformation.updateSize();
-    }
+		private function redraw() { 
+			if (_transformation != null) _transformation.updateSize();
+		}
 
 	#end
+
+    public function setText(value:String) {
+        textField.text = value;
+        redraw();
+	    return value;
+    }
+
+	public function setColor(value:Int) {
+        textFieldFormat.color = value;
+        textField.defaultTextFormat = textFieldFormat;
+        textField.setTextFormat(textFieldFormat);
+        redraw();
+        return value;
+    }
 
 	private static var _defaultFont:Font=null;
 	private static var _defaultFontName:String="";
@@ -95,10 +106,12 @@ class Text extends Bitmap implements IDestroyable
 		return _defaultFontName = value;
 	}
 
-	public function new (stringText:String="",?size:Int=20,?color:Int=0x000000,?font:String="",?smoothing:Bool=true) {
+	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:String=null,?font:String="",?smoothing:Bool=true) {
 		
 		super ();
         _dead = false;
+
+        if (align==null) align = TextFormatAlign.LEFT;
 
 	    textFieldSize = size;
 	    textFieldColor = color;
@@ -120,9 +133,9 @@ class Text extends Bitmap implements IDestroyable
 		#end
 
 		//prepare the TextFormat
-	    var textFieldFormat:TextFormat = new TextFormat(textFieldFont.fontName, textFieldSize , textFieldColor);
+	    textFieldFormat = new TextFormat(textFieldFont.fontName, textFieldSize , textFieldColor);
 
-	    textFieldFormat.align = TextFormatAlign.LEFT;
+	    textFieldFormat.align = align;
 	    textField.autoSize = TextFieldAutoSize.LEFT;
 	    textField.antiAliasType = AntiAliasType.ADVANCED;
 	    textField.defaultTextFormat = textFieldFormat;

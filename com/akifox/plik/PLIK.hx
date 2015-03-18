@@ -592,8 +592,8 @@ class PLIK
 	}
 
 	public static function stopMusic() {
-		if (!_musicOn || _music == null) return;
 		Actuate.stop(_music);
+		if (!_musicOn || _music == null) return;
 		_music.volume = 1;
 		Actuate.tween(_music, 0.5, {volume:0}).ease(Sine.easeOut).onComplete(function(){
 			_music.stop();
