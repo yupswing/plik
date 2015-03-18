@@ -482,6 +482,29 @@ class PLIK
 		#end*/
 	}
 
+	//##########################################################################################
+	//
+	// DOMAIN CHECK
+	//
+	//##########################################################################################
+
+	public static function checkOrigin(domains:String):Bool {
+		#if flash
+		var url:String = 'NULL';
+		try {
+			url = flash.external.ExternalInterface.call("window.location.href.toString");
+		} catch (m:Dynamic) { }
+		if (url=='NULL') url = Lib.current.stage.loaderInfo.loaderURL; 
+		//trace(url);
+		 
+		var domainCheck = new EReg("^http(|s)://("+domains+")","i");
+		if (domainCheck.match(url)) return true;
+		return false;
+		#else
+		return true;
+		#end
+	}
+
 
 
 	//##########################################################################################
