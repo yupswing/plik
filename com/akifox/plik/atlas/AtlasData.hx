@@ -205,6 +205,11 @@ class AtlasData
 		_tilesheet.drawTiles(graphics, [x+offset.x,y+offset.y,rect.x,rect.y,rect.width,rect.height,alpha], true, Tilesheet.TILE_ALPHA | Tilesheet.TILE_RECT,7);
 	}
 
+	public function drawNowBatch(graphics:Graphics, data:Array<Float>, smoothing:Bool, renderFlags:Int, dataIndex:Int) {
+		_tilesheet.drawTiles(graphics, data, smoothing, renderFlags, dataIndex);
+	}
+
+
 	/**
 	 * Prepares a tile to be drawn using a matrix
 	 * @param  rect   The source rectangle to draw

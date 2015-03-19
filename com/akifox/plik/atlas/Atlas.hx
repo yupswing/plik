@@ -1,6 +1,7 @@
 package com.akifox.plik.atlas;
 
 import openfl.display.Sprite;
+import openfl.display.Graphics;
 import openfl.geom.Rectangle;
 
 import com.akifox.plik.atlas.AtlasData;
@@ -68,6 +69,12 @@ class Atlas
 		red:Float, green:Float, blue:Float, alpha:Float, ?smooth:Bool)
 	{
 		_data.prepareTile(rect, x, y, layer, scaleX, scaleY, angle, red, green, blue, alpha, smooth);
+	}
+
+
+
+	public function drawNowBatch(graphics:Graphics, data:Array<Float>, smoothing:Bool, renderFlags:Int, dataIndex:Int) {
+		_data.drawNowBatch(graphics, data, smoothing, renderFlags, dataIndex);
 	}
 
 	/**

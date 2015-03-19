@@ -13,6 +13,11 @@ class AtlasRegion
 	 */
 	public var rotated:Bool;
 	/**
+	 * Rect of this region
+	 */
+	public var rect(get, never):Rectangle;
+	private inline function get_rect():Rectangle { return _rect; }
+	/**
 	 * Width of this region
 	 */
 	public var width(get, never):Float;

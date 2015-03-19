@@ -68,6 +68,7 @@ class PLIK
 		APPID = appid;
 		Data.setId(APPID);
 		_transition_mode = TRANSITION_NONE;
+		_transition_enabled = true;
 
 		//sound init
 		initSfx();
@@ -224,15 +225,25 @@ class PLIK
 		_currentScene.resume();
 	}
 
-	public static inline var _transition_offset = 300; // offset drawing for the ghost
-	public static inline var _transition_span = 250; // distance between slides
+	private static inline var _transition_offset = 300; // offset drawing for the ghost
+	private static inline var _transition_span = 250; // distance between slides
 
 	private static var _currentScene(default, null):Screen;
 	private static var _oldScene(default, null):Screen;
 	private static var _holdScene(default, null):Screen;
 	private static var _screenContainer:DisplayObjectContainer;
 
-	public static var _transition_mode:String = ""; // USE TRANSITION_XXX
+	private static var _transition_mode:String = ""; // USE TRANSITION_XXX
+	private static var _transition_enabled:Bool = true; // USE TRANSITION_XXX
+	public static var transitionEnabled(get,set):Bool;
+	private static function get_transitionEnabled():Bool {
+		return _transition_enabled;
+	}
+	private static function set_transitionEnabled(value:Bool):Bool {
+		_transition_enabled = value;
+		return value;
+	}
+
 
 	private static var _isSceneOnHold:Bool=false;
 	private static var _makeSceneOnHold:Bool=false;
@@ -344,8 +355,11 @@ class PLIK
 			currentWidth = Lib.current.stage.stageWidth;
 			currentHeight = Lib.current.stage.stageHeight;
 
-			if (transition != "") _transition_mode = transition;
-			//_transition_mode = TRANSITION_NONE;
+			if (_transition_enabled) {
+				if (transition != "") _transition_mode = transition;
+			} else {
+				_transition_mode = TRANSITION_NONE;
+			}
 
 			if (_currentScene != null) {
 
