@@ -62,8 +62,9 @@ class Preloader extends NMEPreloader
 
         //first resize and listener
         stage_onResize(null);
-        Lib.current.stage.addEventListener (Event.RESIZE, stage_onResize);
-        Lib.current.stage.addEventListener (MouseEvent.CLICK, gotoWebsite, false, 0, true);
+        Lib.current.stage.addEventListener(Event.RESIZE, stage_onResize);
+        Lib.current.stage.addEventListener(Event.ENTER_FRAME, onFrame);
+        Lib.current.stage.addEventListener(MouseEvent.CLICK, gotoWebsite, false, 0, true);
 
         // listener to finish event
         addEventListener(Event.COMPLETE, onComplete);
@@ -73,6 +74,7 @@ class Preloader extends NMEPreloader
         // restore original background color
         Lib.current.stage.color = originalBackgroundColor;
         Lib.current.stage.removeEventListener(Event.RESIZE, stage_onResize);
+        Lib.current.stage.removeEventListener(Event.ENTER_FRAME, onFrame);
         Lib.current.stage.removeEventListener(MouseEvent.CLICK, gotoWebsite);
     }
     
@@ -127,7 +129,7 @@ class Preloader extends NMEPreloader
         var y = hh*0.8;
 
         //*SPLASH* Resize the picture
-        var scale:Float = hh / 1.5 / splashHeight; // 1/3 of total
+        var scale:Float = hh / 2 / splashHeight;
         splash.scaleX = scale;
         splash.scaleY = scale;
         splash.x = ww/2-splash.width/2;
@@ -169,17 +171,6 @@ class Preloader extends NMEPreloader
 		var percentLoaded = bytesLoaded / bytesTotal;
 		if (percentLoaded > 1) percentLoaded = 1;
 
-        // oscillate from 0.3 to 1 and back for the glowing effect
-        oscillator += oscillatorDirection * 0.06;
-        if (oscillator > 1) {
-            oscillatorDirection = -1;
-            oscillator = 1.0;
-        }
-        if (oscillator < 0.3) {
-            oscillatorDirection = 1;
-            oscillator = 0.3;
-        }
-
         // update the percent label
         textPercent.text = Std.int(percentLoaded*100) + "%";
         textPercent.x = ww-(ww-w)/2-textPercent.textWidth;
@@ -189,11 +180,35 @@ class Preloader extends NMEPreloader
 		progress.graphics.beginFill(color, 0.8);
         progress.graphics.drawRoundRect(0,0,percentLoaded*w,h,r,r);
         progress.graphics.endFill();
-
-        // the glowing effect!
-        textLoading.alpha = oscillator;
-        outline.alpha = oscillator;
 	}
+
+    private static inline var SKIP_FRAMES:Int=5;
+    private var _skipped_frames:Int=1;
+
+    public function onFrame(event:Event):Void {
+
+        if (_skipped_frames==SKIP_FRAMES) {
+
+            // oscillate from 0.3 to 1 and back for the glowing effect
+            oscillator += oscillatorDirection * 0.06;
+            if (oscillator > 1) {
+                oscillatorDirection = -1;
+                oscillator = 1.0;
+            }
+            if (oscillator < 0.3) {
+                oscillatorDirection = 1;
+                oscillator = 0.3;
+            }
+
+            // the glowing effect!
+            textLoading.alpha = oscillator;
+            outline.alpha = oscillator;
+
+            _skipped_frames = 0;
+
+        }
+        _skipped_frames++;
+    }
 
     private function gotoWebsite(event:MouseEvent):Void 
     {

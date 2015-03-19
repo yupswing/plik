@@ -106,7 +106,7 @@ class Text extends Bitmap implements IDestroyable
 		return _defaultFontName = value;
 	}
 
-	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:String=null,?font:String="",?smoothing:Bool=true) {
+	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if flash TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 		
 		super ();
         _dead = false;
