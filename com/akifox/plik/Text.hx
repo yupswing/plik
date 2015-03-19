@@ -12,9 +12,6 @@ import openfl.geom.Rectangle;
 
 import com.akifox.plik.geom.Transformation;
 
-// TODO Editing going on to support transformations
-// will be finished when Transform.hx is done
-
 #if (flash || next)
 import openfl.events.Event;
 // this class it's a TextField
@@ -172,7 +169,7 @@ class Text extends Bitmap implements IDestroyable
         //motion.Actuate.stop(this);
 
         #if gbcheck
-        trace('AKIFOX Destroy ' + this);
+        trace('GB Destroy > ' + this);
         #end
 
     	// destroy this element

@@ -5,21 +5,23 @@ import com.akifox.plik.geom.Transformation;
 
 class ShapeContainer extends Shape implements IDestroyable {
 
-    private var _transformation:Transformation;
+    private var _transformation:Transformation=null;
     public var t(get,never):Transformation;
     private function get_t():Transformation {
         return _transformation;
     }
 
-	public function new() {
+    public function new(?transformation=true) {
         _dead = false;
 		super();
-        _transformation = new Transformation(this.transform.matrix,this.width,this.height);
-        _transformation.bind(this);
+        if (transformation) {
+            _transformation = new Transformation(this.transform.matrix,this.width,this.height);
+            _transformation.bind(this);
+        }
 	}
 
     public function updateTransformation() {
-        _transformation.updateSize(this.width,this.height);
+        if (_transformation!=null) _transformation.updateSize(this.width,this.height);
     }
 
     //##########################################################################################
@@ -35,7 +37,7 @@ class ShapeContainer extends Shape implements IDestroyable {
 
 	public function destroy() {
         #if gbcheck
-        trace('AKIFOX Destroy ' + this);
+        trace('GB Destroy > ' + this);
         #end
         _dead = true;
 	}

@@ -61,9 +61,7 @@ class Screen extends Sprite implements IDestroyable
     public function get_dead():Bool { return _dead; }
 
 	public function destroy():Void {
-		//trace('destroy ' + this);
 		_dead = true;
-        //motion.Actuate.stop(this);
 
 		if (numChildren != 0) {
 			var i:Int = numChildren;	
@@ -71,9 +69,9 @@ class Screen extends Sprite implements IDestroyable
 			do {
 				i--;
 				child = getChildAt(i);
-		    	#if gbcheck
-		    	trace('AKIFOX - Launch destroy on ' + child);
-		    	#end
+		    	//#if gbcheck
+		    	//trace("GB > -- Screen " + this + " -- > Launch destroy on " + child);
+		    	//#end
 				child.destroy();
 				removeChildAt(i);							
 			} while (i > 0);

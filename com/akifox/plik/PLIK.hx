@@ -63,7 +63,7 @@ class PLIK
 		if (screenContainer != null){
 			_screenContainer = screenContainer;			
 		} else {
-			throw new Error("AKIFOX Error: Cannot initialize screen container. The value is null.");
+			throw new Error("PLIK Error: Cannot initialize screen container. The value is null.");
 		}
 		APPID = appid;
 		Data.setId(APPID);
@@ -281,7 +281,7 @@ class PLIK
 	private static function destroyScene(scene:Screen) {
 		if (scene==null) return;
     	#if gbcheck
-    	trace('AKIFOX ---------- start removing scene ---------------');
+    	trace('PLIK ---------- start removing scene ---------------');
     	#end
 		scene.unload();
 		scene.destroy();
@@ -289,7 +289,7 @@ class PLIK
 			_screenContainer.removeChild(scene);
 		scene = null;
     	#if gbcheck
-    	trace('AKIFOX ---------- scene removed ---------------');
+    	trace('PLIK ------------- scene removed -------------------');
     	#end
 	}
 

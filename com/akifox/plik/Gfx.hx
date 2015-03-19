@@ -35,9 +35,9 @@ class Gfx extends Bitmap implements IDestroyable {
     }
 
     public function destroyCache() {
-        #if gbcheck
-        trace('AKIFOX Destroy cache for ' + this);
-        #end
+/*        #if gbcheck
+        trace('GB > Cache destroy ' + this);
+        #end*/
     	// destroy this element and the global cache from memory
     	removeBitmap(_name);
     }
@@ -54,7 +54,7 @@ class Gfx extends Bitmap implements IDestroyable {
         //motion.Actuate.stop(this);
 
         #if gbcheck
-        trace('AKIFOX Destroy ' + this);
+        trace('GB Destroy > ' + this);
         #end
         // destroy this element
         if (this._transformation!=null) {
@@ -115,7 +115,7 @@ class Gfx extends Bitmap implements IDestroyable {
 		if (_bitmapCache.exists(name))
 		{        
             #if gbcheck
-            trace('Remove bitmap ' + name);
+            trace('GB > Cache destroy > Bitmap ' + name);
             #end
 			var bitmap = _bitmapCache.get(name);
 			bitmap.dispose();
