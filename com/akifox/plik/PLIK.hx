@@ -419,7 +419,9 @@ class PLIK
 
 		var timing = 1;
 		var delay = 0;
-		//_transition_mode = TRANSITION_ALPHA;
+
+		_currentScene.alpha = 1; //reset the alpha
+		_currentScene.visible = true; //FLASH set visible to false when alpha = 0
 
 
 		if (_transition_mode == TRANSITION_NONE) {
@@ -433,9 +435,6 @@ class PLIK
 
 		var ghostEase = Sine.easeIn;
 		var sceneEase = Expo.easeOut;
-
-		_currentScene.alpha = 1; //reset the alpha
-		_currentScene.visible = true; //FLASH set visible to false when alpha = 0
 
 		var baseX = _currentScene.x;
 		var baseY = _currentScene.y;
