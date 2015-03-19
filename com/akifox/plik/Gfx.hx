@@ -35,9 +35,6 @@ class Gfx extends Bitmap implements IDestroyable {
     }
 
     public function destroyCache() {
-/*        #if gbcheck
-        trace('GB > Cache destroy ' + this);
-        #end*/
     	// destroy this element and the global cache from memory
     	removeBitmap(_name);
     }

@@ -565,8 +565,9 @@ class PLIK
 	private static var _soundOn:Bool=false;
 
 	public static function initSfx(){
-		Sfx.setVolume('sound',0);
+		Sfx.setVolume('sound',1); //fixed
 		Sfx.setVolume('music',1); //fixed
+		Sfx.soundEnabled = false;
 	}
 
 	public static function startMusic(file:String=null,?direct:Bool=false) {
@@ -661,11 +662,10 @@ class PLIK
 	public static function toggleSound():Bool {
 		if(_soundOn) {
 			_soundOn = false;
-			Sfx.setVolume('sound',0);
 		} else {
 			_soundOn = true;
-			Sfx.setVolume('sound',1);
 		}
+		Sfx.soundEnabled = _soundOn; // mute/demute all channels
 		setPref('sound',_soundOn);
 		savePref();
 		return _soundOn;
@@ -692,10 +692,6 @@ class PLIK
 		setPrefField('sound',Data.BOOL,true);
 		setPrefField('fullscreen',Data.BOOL,true);
 
-		// toggle base pref
-		if (getPref('music')) toggleMusic();
-		if (getPref('sound')) toggleSound();
-		if (getPref('fullscreen')) toggleFullscreen();
 	}
 
 	public static function savePref() {

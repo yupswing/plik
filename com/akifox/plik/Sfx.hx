@@ -359,6 +359,9 @@ class Sfx
 	}
 
 	static public function removeSound(name:String):Bool {
+		if (_soundFastPlaying.exists(name)) {
+			_soundFastPlaying.remove(name);
+		}
 		if (_sounds.exists(name))
 		{
 			var sound = _sounds.get(name);
@@ -376,7 +379,44 @@ class Sfx
 		data = null;
 	}
 
+	// fast way to play a sound directly with a cache (no new Sfx instances)
+	private static var _soundFastPlaying:Map<String,Sfx> = new Map<String,Sfx>();
+
+	static public function fastPlay(name:String,?volume:Float=1,?pan:Float=0.5,?type:String="sound") {
+
+		if (!_soundEnabled) return;
+
+		var sound:Sfx;
+		if (!_soundFastPlaying.exists(name))
+		{		
+			sound = new Sfx(name);
+			_soundFastPlaying.set(name, sound);
+		}
+		else
+		{
+			sound = _soundFastPlaying.get(name);
+		}
+		sound.type = type;
+		sound.volume = volume;
+		sound.pan = pan;
+		sound.play();
+
+	}
+
+	private static var _soundEnabled:Bool = true;
+	public static var soundEnabled(get,set):Bool;
+	private static function get_soundEnabled():Bool {
+		return _soundEnabled;
+	}
+	private static function set_soundEnabled(value:Bool):Bool {
+		for (type in _typePlaying.keys()) {
+			//setVolume(type,(value?1:0));
+		}
+		return _soundEnabled = value;
+	}
+
 	// Sound infromation.
+
 	private var _type:String;
 	private var _volume:Float = 1;
 	private var _pan:Float = 0;
