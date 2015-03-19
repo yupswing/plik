@@ -316,9 +316,9 @@ class PLIK
 		if (inTransition) {
 			//it is currently in transition
 			// need to be stopped and destroyed
-			// STOP will trigger the endTransition
-			Actuate.stop(_currentScene);
 			Actuate.stop(_oldScene);
+			Actuate.stop(_holdScene);
+			Actuate.stop(_currentScene); // this STOP will trigger the endTransition
 		}
 
 		_isSceneOnHold = false;
