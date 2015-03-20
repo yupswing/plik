@@ -619,11 +619,11 @@ class PLIK
 		if (!_musicOn || _music == null) return;
 		_music.stop();
 		if (_musicOut!=null) _musicOut.stop();
-
 	}
 
 	public static function resumeMusic() {
 		if (!_musicOn || _music == null) return;
+		_music.stop(); //otherwise it could be double resume (two playing sounds)
 		_music.resume();
 		if (_musicOut!=null) _musicOut.resume();
 	}
