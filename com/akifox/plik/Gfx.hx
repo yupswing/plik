@@ -68,6 +68,7 @@ class Gfx extends Bitmap implements IDestroyable {
 
 	// Bitmap storage.
 	private static var _bitmapCache:Map<String,BitmapData> = new Map<String,BitmapData>();
+	private static var _multiResolutionBasePath:String = "assets/graphics/";
 
 	private static function reloadBitmaps():Bool {
 		for (el in _bitmapCache.keys()) {
@@ -78,7 +79,11 @@ class Gfx extends Bitmap implements IDestroyable {
 	}
 
 	public static function bitmapPath(name:String):String {
-		return "graphics_"+PLIK.resolutionX+"/"+name;
+		return Gfx._multiResolutionBasePath+PLIK.resolutionX+"/"+name;
+	}
+
+	public static function setMultiResolutionBasePath(path:String) {
+		Gfx._multiResolutionBasePath = path;
 	}
 
 	public static function preloadBitmap(name:String):Void {
