@@ -26,19 +26,7 @@ Haxe/OpenFL class to display FPS stats and memory usage.
 ![Screenshot](https://dl.dropboxusercontent.com/u/683344/akifox/akifox-lib/performance-screenshot.png)
 
 
-### com.akifox.plik.geom.Transformation
-Haxe/OpenFL class to manage Affine Transformations
-
-[Check the class here](com/akifox/plik/geom)
-
-
 ### com.akifox.plik.atlas.*
 Haxe/OpenFL classes to manage Texture Atlas
 
 [Check the class here](com/akifox/plik/atlas)
-
-
-### com.akifox.plik.net.AsyncHttpRequest
-Haxe/OpenFL class to manage multithreading  asyncronous http requests
-
-[Check the class here](com/akifox/plik/net)

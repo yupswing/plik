@@ -1,7 +1,7 @@
 
 package com.akifox.plik;
 import openfl.display.Shape;
-import com.akifox.plik.geom.Transformation;
+import com.akifox.transform.Transformation;
 
 class ShapeContainer extends Shape implements IDestroyable {
 

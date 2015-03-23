@@ -10,19 +10,19 @@ import openfl.text.AntiAliasType;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 
-import com.akifox.plik.geom.Transformation;
+import com.akifox.transform.Transformation;
 
 #if (flash || next)
 import openfl.events.Event;
 // this class it's a TextField
 // Flash renders the TextField beautifully and it doesn't need any trick
-class Text extends TextField implements IDestroyable
+class Text extends TextField
 #else
 // this class is a Bitmap encapsulating a TextField
 // the TextField will be drawn every time it changes (now only .text)
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
-class Text extends Bitmap implements IDestroyable
+class Text extends Bitmap
 #end
 {
 	var textField:TextField;
@@ -106,7 +106,6 @@ class Text extends Bitmap implements IDestroyable
 	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if flash TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 		
 		super ();
-        _dead = false;
 
         if (align==null) align = TextFormatAlign.LEFT;
 
@@ -159,14 +158,8 @@ class Text extends Bitmap implements IDestroyable
     public override function toString():String {
         return '[PLIK.Text "'+text+'"]';
     }
-	
-	private var _dead:Bool=false;
-	public var dead(get,never):Bool;
-    public function get_dead():Bool { return _dead; }
 
     public function destroy() {
-	 	_dead = true;
-        //motion.Actuate.stop(this);
 
         #if gbcheck
         trace('GB Destroy > ' + this);

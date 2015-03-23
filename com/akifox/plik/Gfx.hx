@@ -7,7 +7,7 @@ import openfl.display.BitmapData;
 import openfl.display.Bitmap;
 import openfl.display.Graphics;
 import openfl.display.DisplayObject;
-import com.akifox.plik.geom.Transformation;
+import com.akifox.transform.Transformation;
 import com.akifox.plik.atlas.TextureAtlas;
 
 class Gfx extends Bitmap implements IDestroyable {

@@ -1,7 +1,7 @@
 
 package com.akifox.plik;
 import openfl.display.Sprite;
-import com.akifox.plik.geom.Transformation;
+import com.akifox.transform.Transformation;
 
 class SpriteContainer extends Sprite implements IDestroyable {
 
