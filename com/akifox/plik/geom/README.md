@@ -1,9 +1,3 @@
-[![akifox-transform](https://img.shields.io/badge/library-akifox%20transform%202.0-brightgreen.svg)]()
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Haxe 3](https://img.shields.io/badge/language-Haxe%203-orange.svg)](http://www.haxe.org)
-[![OpenFL 2](https://img.shields.io/badge/require-OpenFL 2-red.svg)](http://www.openfl.org)
-[![Cross platform](https://img.shields.io/badge/platform-cross%20platform-lightgrey.svg)](http://www.openfl.org)
-
 # akifox-transform (com.akifox.plik.geom.Transformation)
 **Transformation HAXE/OpenFL Class**
 
@@ -11,8 +5,6 @@ The akifox-transform class aims to provide an easy tool to manage affine transfo
 What are the affine transformation you might ask...
 - read <a href="http://en.wikipedia.org/wiki/Affine_transformation">this wikipedia page</a>
 - read <a href="http://www.senocular.com/flash/tutorials/transformmatrix/">this great flash tutorial</a>
-
-You can find a working example in the <a href="https://github.com/yupswing/akifox-transform/tree/master/example">example folder</a>. (read below for more information)
 
 ## Example demo
 
@@ -38,29 +30,7 @@ You should get a window with a OpenFL logo square.
 
 ## Install
 
-You can easily install the library from haxelib
-```
-haxelib install akifox-transform
-```
-
-In your project add the library reference in your ```project.xml```
-
-```
-<haxelib name="akifox-transform" />
-```
-
-and finally you can import it in your project class with this import
-```
-import com.akifox.transform.Transformation;
-```
-
--------------
-
-If you want to use instead the latest version you should use this library
-**com.akifox.plik.geom.Transformation**
-```
-haxelib git akifox-transform https://github.com/yupswing/plik.git
-```
+You can easily install the PLIK library (see the main [README.md](/README.md))
 
 In your project add the library reference in your ```project.xml```
 
@@ -81,33 +51,29 @@ You can read the full Library documentation <a href="https://dl.dropboxuserconte
 
 ## Using the library
 
-Once you got a DisplayObject (Sprites, Bitmap...) you can create a Transformation object linked to it.
-(Don't use more than one transformation at a given time. I will code this check later on)
+The Transformation class works on Matrix objects.
+Anyway usually once you've got a DisplayObject (Sprites, Bitmap...) you want to link this to a Transformation.
+
 
 ````haxe
-import com.akifox.transform.Transformation; //or com.akifox.plik.geom.Transformation
+import com.akifox.plik.geom.Transformation
 
 // [...]
-    trf = new Transformation(YOUROBJECT);
+    trf = new Transformation();
+    trf.bind(yourDisplayObject);
     trf.setAnchoredPivot(Transformation.ANCHOR_TOP_LEFT);
-                               
+    
     // these are the Pivot Point coordinates (they will not change unless
     // you change the pivot point position)
     var pivotCoordinates:Point = trf.getPivot();
 
-    trf.rotate(20); //rotate 20degrees clockwise
-    trf.skewX(30); //skew X axis 20degrees
+    trf.rotate(20); //rotate by 20deg clockwise
+    trf.skewX(30); //skew X axis by 30deg
     Actuate.tween(trf,1,{'scalingX':2,'scalingY'"2}); //scale 2X in 1s using Actuate
 ````
 
-## Work in progress
-
-- [x] Package in a haxelib library (http://lib.haxe.org/p/akifox-transform)
-
-#### Demos
-- [x] Interactive desktop version ([x] flash,[x] native, [ ] html5)
-- [ ] *Interactive mobile version* (android, ios)
-- [ ] *Sprite example with Transformation encapsulated*
+There is an interesting example in different classes on the PLIK library that shows how to encapsulate the transformation class with an object.
+See the [Gfx Class](/Gfx.hx) for an example.
 
 #### Transformation class
 - [ ] *Unit test*
