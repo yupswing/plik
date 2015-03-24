@@ -12,7 +12,7 @@ import openfl.geom.Rectangle;
 
 import com.akifox.transform.Transformation;
 
-#if (flash || next)
+#if (flash || !v2)
 import openfl.events.Event;
 // this class it's a TextField
 // Flash renders the TextField beautifully and it doesn't need any trick
@@ -31,7 +31,7 @@ class Text extends Bitmap
 	var textFieldFormat:TextFormat;
 	var textFieldSize:Int;
 
- 	#if (!flash && !next)
+ 	#if (!flash && v2)
 
 	 	// make the use of .text the same in every target
 	 	var textFieldBitmapData:BitmapData;
@@ -103,7 +103,7 @@ class Text extends Bitmap
 		return _defaultFontName = value;
 	}
 
-	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if flash TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
+	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if !v2 TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 		
 		super ();
 
@@ -118,7 +118,7 @@ class Text extends Bitmap
 	    }
 
 
- 		#if (flash || next)
+ 		#if (flash || !v2)
 		    // this class it's actually a TextField
 		    textField = this;
 	    #else
@@ -169,7 +169,7 @@ class Text extends Bitmap
     	this._transformation.destroy();
     	this._transformation = null;
 
-	 	#if (!flash && !next)
+	 	#if (!flash && v2)
 		bitmapData = null;
 	 	textFieldBitmapData.dispose();
 	 	textFieldBitmapData = null;

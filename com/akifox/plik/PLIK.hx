@@ -759,7 +759,7 @@ class PLIK
 	}
 
 	public static function quit(){
-		#if (!flash && !html5 && !next)
+		#if v2
 		Lib.exit();
 		#end
 	}
