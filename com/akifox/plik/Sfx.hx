@@ -34,7 +34,7 @@ class Sfx
 	 * @param	source		The embedded sound class to use.
 	 * @param	complete	Optional callback function for when the sound finishes playing.
 	 */
-	public function new(source:Dynamic, complete:Void -> Void = null)
+	public function new(source:String, ?isMusic:Bool = false, ?complete:Void -> Void = null)
 	{
 		_transform = new SoundTransform();
 		_volume = 1;
@@ -42,44 +42,17 @@ class Sfx
 		_position = 0;
 		_type = "";
 
-		if (source == null)
-			throw "Invalid source Sound.";
-
-		if (Std.is(source, String))
-		{
-			if (_sounds.exists(source)) {
-				//trace('cache '+source);
-				_sound = _sounds[source];
+		if (_sounds.exists(source)) {
+			//trace('cache '+source);
+			_sound = _sounds[source];
+		} else {
+			//trace('load '+source);
+			if (isMusic) {
+				_sound = Assets.getMusic(source + FORMAT,false);
 			} else {
-				//trace('load '+source);
 				_sound = Assets.getSound(source + FORMAT,false);
-				_sounds.set(source, _sound);
 			}
-		}
-		else
-		{
-			var className:String = Type.getClassName(Type.getClass(source));
-			
-			if (StringTools.endsWith(className, "media.Sound"))
-			{
-				// used for loading sound runtime (data-driven for test and debug)
-				var __sound:Sound = cast source;
-				_sound = _sounds.get(__sound.url);
-				if ( _sound == null )
-				{
-					_sound = source;
-					_sounds.set(__sound.url, source);
-				}
-			}
-			else
-			{
-				_sound = _sounds.get(className);
-				if (_sound == null)
-				{
-					_sound = source;
-					_sounds.set(className, source);
-				}
-			}
+			_sounds.set(source, _sound);
 		}
 
 		this.complete = complete;
@@ -372,9 +345,14 @@ class Sfx
 		return false;
 	}
 
-	static public function preloadSound(name:String):Void {
-        if (_sounds.exists(name)) return;
-        var data:Sound = Assets.getSound(name + FORMAT,false);
+	static public function preloadSound(name:String, ?isMusic:Bool = false):Void {
+    if (_sounds.exists(name)) return;
+		var data:Sound;
+		if (isMusic) {
+			data = Assets.getMusic(name + FORMAT,false);
+		} else {
+			data = Assets.getSound(name + FORMAT,false);
+		}
 		if (data != null) _sounds.set(name, data);
 		data = null;
 	}
@@ -388,7 +366,7 @@ class Sfx
 
 		var sound:Sfx;
 		if (!_soundFastPlaying.exists(name))
-		{		
+		{
 			sound = new Sfx(name);
 			_soundFastPlaying.set(name, sound);
 		}
