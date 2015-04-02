@@ -20,18 +20,18 @@ import openfl.display.BitmapData;
 
 // please provide this files (or change them) in your assets folder
 // and add this line to your project.xml
-// <assets path="assets/preloader" rename="preloader" include="*" />
+// <assets path="assets/preloader" include="*" if="web" />
 @:font("assets/preloader/square.ttf") class DefaultFont extends Font {}
 @:bitmap("assets/preloader/logo.png") class Splash extends BitmapData {}
 
 class Preloader extends NMEPreloader
 {
-    // **** CUSTOMIZE HERE ****
+    // **** CUSTOMISE HERE ****
     static var color = 0xff9600; //the main color
     static var backgroundColor = 0x333333; //background color
     static var stringLoading = "Loading"; //the loading label text
     static var website = "http://akifox.com"; //your website, every click count!
-    // **** END CUSTOMIZE ****
+    // **** END CUSTOMISE ****
 
     var originalBackgroundColor:Int;
 
@@ -46,7 +46,7 @@ class Preloader extends NMEPreloader
 
     var textPercent:TextField; // percentage label
     var textLoading:TextField; // loading label
-    
+
     var oscillator:Float = 1.0; // alpha for glowing effect
     var oscillatorDirection:Int = -1; // increase or decrease
 
@@ -55,9 +55,9 @@ class Preloader extends NMEPreloader
     var splashHeight:Float;
 
     public function new () {
-        
+
         super ();
-        
+
         init ();
 
         //first resize and listener
@@ -68,7 +68,7 @@ class Preloader extends NMEPreloader
 
         // listener to finish event
         addEventListener(Event.COMPLETE, onComplete);
-        
+
     }
     public function onComplete (event:Event):Void {
         // restore original background color
@@ -77,7 +77,7 @@ class Preloader extends NMEPreloader
         Lib.current.stage.removeEventListener(Event.ENTER_FRAME, onFrame);
         Lib.current.stage.removeEventListener(MouseEvent.CLICK, gotoWebsite);
     }
-    
+
     private function init ():Void {
 
         Font.registerFont (DefaultFont);
@@ -107,14 +107,14 @@ class Preloader extends NMEPreloader
         addChild(textLoading);
 
     }
-    
-    
+
+
     private function stage_onResize (event:Event):Void {
 
         resize (Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
-        
+
     }
-    
+
     private function resize (newWidth:Int, newHeight:Int):Void {
 
         ww = newWidth;
@@ -140,7 +140,7 @@ class Preloader extends NMEPreloader
         outline.graphics.clear();
         outline.graphics.lineStyle(t, color, 1, true);
         outline.graphics.drawRoundRect(0,0,w+2*p,h+2*p,r*2,r*2);
-        
+
         progress.x = x;
         progress.y = y;
         progress.scaleX = 1;
@@ -162,7 +162,7 @@ class Preloader extends NMEPreloader
         textPercent.autoSize = TextFieldAutoSize.RIGHT;
         textPercent.x = ww-(ww-w)/2-textPercent.textWidth;
         textPercent.y = y+1.5*h;
-        
+
     }
 
 	public override function onUpdate(bytesLoaded:Int, bytesTotal:Int)
@@ -210,7 +210,7 @@ class Preloader extends NMEPreloader
         _skipped_frames++;
     }
 
-    private function gotoWebsite(event:MouseEvent):Void 
+    private function gotoWebsite(event:MouseEvent):Void
     {
         // open an url
         Lib.getURL(new URLRequest (website));
