@@ -70,6 +70,8 @@ class PLIK
 		_transition_mode = TRANSITION_NONE;
 		_transition_enabled = true;
 
+		Lib.current.stage.addEventListener(Event.CLOSE,onClose);
+
 		//sound init
 		initSfx();
 
@@ -536,6 +538,11 @@ class PLIK
 
 	//##########################################################################################
 
+	public static function setDefaultFont(name:String) {
+		preloadFont(name);
+		Text.defaultFont = name;
+	}
+
 	// Font storage.
 	private static var _font:Map<String,Font> = new Map<String,Font>();
 
@@ -613,14 +620,19 @@ class PLIK
 		}
 	}
 
-	public static function stopMusic() {
+	public static function stopMusic(?force=false) {
 		Actuate.stop(_music);
 		if (!_musicOn || _music == null) return;
-		_music.volume = 1;
-		Actuate.tween(_music, 0.5, {volume:0}).ease(Sine.easeOut).onComplete(function(){
+		if (force) {
 			_music.stop();
 			_music = null;
-		});
+		} else {
+			_music.volume = 1;
+			Actuate.tween(_music, 0.5, {volume:0}).ease(Sine.easeOut).onComplete(function(){
+				_music.stop();
+				_music = null;
+			});
+		}
 	}
 
 	public static function pauseMusic() {
@@ -767,9 +779,15 @@ class PLIK
 	}
 
 	public static function quit(){
+		onClose(null);
 		#if v2
 		Lib.exit();
 		#end
+	}
+
+	public static function onClose(e:Event){
+		Actuate.reset();
+		stopMusic(true);
 	}
 
 }

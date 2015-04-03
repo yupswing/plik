@@ -9,12 +9,23 @@ import openfl.text.TextFieldAutoSize;
 import openfl.text.AntiAliasType;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
-
 import com.akifox.transform.Transformation;
 
-import openfl.events.Event;
 class Text extends TextField
 {
+
+	// DefaultFont is used by TextAA as well
+	private static var _defaultFont:String="";
+	public static var defaultFont(get,set):String;
+	private static function get_defaultFont():String {
+		return _defaultFont;
+	}
+	private static function set_defaultFont(value:String):String {
+		return _defaultFont = value;
+	}
+
+  //##########################################################################################
+
 	var textField:TextField;
 	var textFieldFont:Font;
 	var textFieldColor:Int;
@@ -39,18 +50,6 @@ class Text extends TextField
         return value;
     }
 
-	private static var _defaultFont:Font=null;
-	private static var _defaultFontName:String="";
-	public static var defaultFont(get,set):String;
-	private static function get_defaultFont():String {
-		return _defaultFontName;
-
-	}
-	private static function set_defaultFont(value:String):String {
-		_defaultFont = PLIK.getFont(value);
-		return _defaultFontName = value;
-	}
-
 	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if !v2 TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 
 		super ();
@@ -59,11 +58,8 @@ class Text extends TextField
 
     textFieldSize = size;
     textFieldColor = color;
-    if (font=="") {
-    	textFieldFont = _defaultFont;
-    } else {
-    	textFieldFont = PLIK.getFont(font);
-    }
+    if (font=="") font = _defaultFont;
+    textFieldFont = PLIK.getFont(font);
 
 		textField = this;
 
@@ -85,29 +81,28 @@ class Text extends TextField
 
 	}
 
-    private var _transformation:Transformation;
-    public var t(get,never):Transformation;
-    private function get_t():Transformation {
-        return _transformation;
-    }
+	private var _transformation:Transformation;
+	public var t(get,never):Transformation;
+	private function get_t():Transformation {
+	    return _transformation;
+	}
 
-    //##########################################################################################
-    // IDestroyable
+	//##########################################################################################
+	// IDestroyable
 
-    public override function toString():String {
-        return '[PLIK.Text "'+text+'"]';
-    }
+	public override function toString():String {
+	    return '[PLIK.Text "'+text+'"]';
+	}
 
-    public function destroy() {
+	public function destroy() {
 
-      #if gbcheck
-      trace('GB Destroy > ' + this);
-      #end
+	  #if gbcheck
+	  trace('GB Destroy > ' + this);
+	  #end
 
-    	// destroy this element
-    	this._transformation.destroy();
-    	this._transformation = null;
-		}
-
+		// destroy this element
+		this._transformation.destroy();
+		this._transformation = null;
+	}
 
 }

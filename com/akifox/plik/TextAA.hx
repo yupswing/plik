@@ -78,18 +78,6 @@ class TextAA extends Bitmap
       return value;
   }
 
-	private static var _defaultFont:Font=null;
-	private static var _defaultFontName:String="";
-	public static var defaultFont(get,set):String;
-	private static function get_defaultFont():String {
-		return _defaultFontName;
-
-	}
-	private static function set_defaultFont(value:String):String {
-		_defaultFont = PLIK.getFont(value);
-		return _defaultFontName = value;
-	}
-
 	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if !v2 TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 
 		super ();
@@ -98,11 +86,8 @@ class TextAA extends Bitmap
 
     textFieldSize = size;
     textFieldColor = color;
-    if (font=="") {
-    	textFieldFont = _defaultFont;
-    } else {
-    	textFieldFont = PLIK.getFont(font);
-    }
+    if (font=="") font = Text.defaultFont;
+    textFieldFont = PLIK.getFont(font);
 
 		// this class is a Bitmap encapsulating a TextField
 		textField = new TextField();
