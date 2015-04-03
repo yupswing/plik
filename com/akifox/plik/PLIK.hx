@@ -35,7 +35,7 @@ class PLIK
 
 
 	//##########################################################################################
-	
+
 	/** Constant factor to pass from degrees to radians **/
     public static var DEG2RAD:Float = Math.PI/180;
 	/** Constant factor to pass from radians to degrees **/
@@ -59,9 +59,9 @@ class PLIK
 
 	public static var APPID:String = "";
 
-	public static function initialize(screenContainer:DisplayObjectContainer,appid:String):Void {								
+	public static function initialize(screenContainer:DisplayObjectContainer,appid:String):Void {
 		if (screenContainer != null){
-			_screenContainer = screenContainer;			
+			_screenContainer = screenContainer;
 		} else {
 			throw new Error("PLIK Error: Cannot initialize screen container. The value is null.");
 		}
@@ -126,6 +126,14 @@ class PLIK
 		return _pointFactor;
 	}
 
+	public static function adjust(value:Float):Float {
+		return value*_pointFactor;
+	}
+
+	public static function adjustInt(value:Float):Int {
+		return Std.int(value*_pointFactor);
+	}
+
 	public static function setResolution(width:Int=0,ratio:Int=0){
 		if (ratio>0) _ratio = ratio;
 		var w:Float = realresolution[0];
@@ -134,7 +142,7 @@ class PLIK
 		#if !ios
 		if (w > 1920) { //2560
 				resolution = [2560,2560/_ratio];
-		} else 
+		} else
 		#end
 		if (w > 1280) { //1920
 				resolution = [1920,1920/_ratio];
@@ -157,12 +165,12 @@ class PLIK
 		if (multitouchOn)
 		{
 			// If so, set the input mode and hook up our event handlers
-			// TOUCH_POINT means simple touch events will be dispatched, 
+			// TOUCH_POINT means simple touch events will be dispatched,
 			// rather than gestures or mouse events
 			Multitouch.inputMode = MultitouchInputMode.TOUCH_POINT;
 		}
 	}
-	
+
 	#if !mobile
 	#if debug
 	private static function keyUp(event:KeyboardEvent) {
@@ -188,7 +196,7 @@ class PLIK
 		hold();
 	}
 
-	private static function active(event:Dynamic):Void { 
+	private static function active(event:Dynamic):Void {
 		resume();
 	}
 
@@ -251,14 +259,14 @@ class PLIK
 
 	private static var currentWidth:Float;
 	private static var currentHeight:Float;
-	
-/*	private static var previousTime:Int = 0;	
+
+/*	private static var previousTime:Int = 0;
 	public static function update():Void {
 		var currentTime:Int = Lib.getTimer();
-		var deltaTime = (currentTime - previousTime) / 1000;	
-		
+		var deltaTime = (currentTime - previousTime) / 1000;
+
 		_currentScene.update(deltaTime);
-		
+
 		previousTime = currentTime;
 	}*/
 
@@ -310,7 +318,7 @@ class PLIK
 		destroyScene(_holdScene);
 		_holdScene=null;
 	}
-	
+
 	private static function loadScreen(?newScreen:Screen=null,?transition:String="",?modal:Bool=false):Void {
 
 		if (inTransition) {
@@ -334,7 +342,7 @@ class PLIK
 		if (!isResume && !isMakeHold) {
 			//normal load screen
 			if (newScreen.holdable) {
-				// if the new screen is holdable destroy 
+				// if the new screen is holdable destroy
 				// any possible currently holded screen
 				destroyHold();
 			}
@@ -364,7 +372,7 @@ class PLIK
 			if (_currentScene != null) {
 
 				_currentScene.hold();
-				
+
 				if (isMakeHold) {
 					//trace('1. modal hold scene');
 					//destroyHold();
@@ -377,13 +385,13 @@ class PLIK
 			//else{
 				//trace('0. NO PREVIOUS SCREEN');
 				//trace('1. NO PREVIOUS SCREEN');
-			//}	
-			
+			//}
+
 			#if flash
 			openfl.system.System.gc();
 			#elseif cpp
 			cpp.vm.Gc.run(true);
-			#elseif neko		
+			#elseif neko
 			neko.vm.Gc.run(true);
 			#end
 
@@ -461,20 +469,20 @@ class PLIK
 				_currentScene.y -= currentHeight+_transition_span;
 				if (_oldScene!=null) {
 					Actuate.tween (_oldScene, timing, { y: oldY+currentHeight+_transition_span }).ease(ghostEase).delay(delay);
-					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
+					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
 				}
 				Actuate.tween (_currentScene, timing, { y: baseY }).ease(sceneEase).delay(delay).onComplete(endTransition);
 			case TRANSITION_SLIDE_LEFT:
 				_currentScene.x += currentWidth+_transition_span;
 				if (_oldScene!=null) {
 					Actuate.tween (_oldScene, timing, { x: oldX-currentWidth-_transition_span }).ease(ghostEase).delay(delay);
-					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);	
+					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
 				}
 				Actuate.tween (_currentScene, timing, { x: baseX }).ease(sceneEase).delay(delay).onComplete(endTransition);
 			case TRANSITION_SLIDE_RIGHT:
 				_currentScene.x -= currentWidth+_transition_span;
 				if (_oldScene!=null) {
-					Actuate.tween (_oldScene, timing, { x: oldX+currentWidth+_transition_span }).ease(ghostEase).delay(delay);	
+					Actuate.tween (_oldScene, timing, { x: oldX+currentWidth+_transition_span }).ease(ghostEase).delay(delay);
 					Actuate.tween (_oldScene, timing/3+0.1, { alpha:0 }).ease(ghostEase).delay(delay);
 				}
 				Actuate.tween (_currentScene, timing, { x: baseX }).ease(sceneEase).delay(delay).onComplete(endTransition);
@@ -507,9 +515,9 @@ class PLIK
 		try {
 			url = flash.external.ExternalInterface.call("window.location.href.toString");
 		} catch (m:Dynamic) { }
-		if (url=='NULL') url = Lib.current.stage.loaderInfo.loaderURL; 
+		if (url=='NULL') url = Lib.current.stage.loaderInfo.loaderURL;
 		//trace(url);
-		 
+
 		var domainCheck = new EReg("^http(|s)://("+domains+")","i");
 		if (domainCheck.match(url)) return true;
 		return false;
@@ -534,8 +542,8 @@ class PLIK
 	public static function getFont(name:String):Font
 	{
 		if (_font.exists(name)) return _font.get(name);
-		var data:Font = openfl.Assets.getFont(name, false); 
-		if (data != null) _font.set(name, data); 
+		var data:Font = openfl.Assets.getFont(name, false);
+		if (data != null) _font.set(name, data);
 		return data;
 	}
 
@@ -596,7 +604,7 @@ class PLIK
 		} else {
 			_musicLast = file;
 		}
-		
+
 		_music = getMusic(file);
 		_music.loop();
 		if (!direct) {
@@ -677,7 +685,7 @@ class PLIK
 	// PREFERENCES
 	//
 	//##########################################################################################
-	
+
 	private static inline var prefID = 'pref';
 
 	public static function setPrefField(name:String,type:Int,defaultValue:Dynamic){
@@ -713,7 +721,7 @@ class PLIK
 	// UID Generator
 	//
 	//##########################################################################################
-	
+
 	private static var UID_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 	public static function randomUID(?size:Int=32):String

@@ -12,7 +12,7 @@ import com.akifox.plik.atlas.TextureAtlas;
 
 class Gfx extends Bitmap implements IDestroyable {
 
-    
+
     private var _name:String;
 
     private var _transformation:Transformation;
@@ -68,7 +68,8 @@ class Gfx extends Bitmap implements IDestroyable {
 
 	// Bitmap storage.
 	private static var _bitmapCache:Map<String,BitmapData> = new Map<String,BitmapData>();
-	private static var _multiResolutionBasePath:String = "assets/graphics/";
+	private static var _basePath:String = "assets/graphics/";
+  private static var _multiResolution:Bool=false;
 
 	private static function reloadBitmaps():Bool {
 		for (el in _bitmapCache.keys()) {
@@ -79,11 +80,21 @@ class Gfx extends Bitmap implements IDestroyable {
 	}
 
 	public static function bitmapPath(name:String):String {
-		return Gfx._multiResolutionBasePath+PLIK.resolutionX+"/"+name;
+    if (_multiResolution) {
+		    return Gfx._basePath+PLIK.resolutionX+"/"+name;
+    } else {
+		    return Gfx._basePath+name;
+    }
 	}
 
 	public static function setMultiResolutionBasePath(path:String) {
-		Gfx._multiResolutionBasePath = path;
+    _multiResolution = true;
+		Gfx._basePath = path;
+	}
+
+	public static function setBasePath(path:String) {
+    _multiResolution = false;
+		Gfx._basePath = path;
 	}
 
 	public static function preloadBitmap(name:String):Void {
@@ -115,7 +126,7 @@ class Gfx extends Bitmap implements IDestroyable {
 	public static function removeBitmap(name:String):Bool
 	{
 		if (_bitmapCache.exists(name))
-		{        
+		{
             #if gbcheck
             trace('GB > Cache destroy > Bitmap ' + name);
             #end

@@ -9,7 +9,7 @@ import openfl.Lib;
 import motion.Actuate;
 
 /**
- 
+
 	Cycle is
 
 	AKIFOX create -> NEW -> INITIALIZE -> listen ADDED_TO_STAGE event
@@ -21,7 +21,7 @@ import motion.Actuate;
 
  */
 class Screen extends Sprite implements IDestroyable
-{				
+{
 	public var currentScale:Float = 1;
 	public var rwidth:Float = 1;
 	public var rheight:Float = 1;
@@ -33,7 +33,6 @@ class Screen extends Sprite implements IDestroyable
 	private var cycle:Bool = false;
 
 	public var holdable:Bool = false;
-
 
 	public function new () {
 		super();
@@ -64,7 +63,7 @@ class Screen extends Sprite implements IDestroyable
 		_dead = true;
 
 		if (numChildren != 0) {
-			var i:Int = numChildren;	
+			var i:Int = numChildren;
 			var child:Dynamic;
 			do {
 				i--;
@@ -73,7 +72,7 @@ class Screen extends Sprite implements IDestroyable
 		    	//trace("GB > -- Screen " + this + " -- > Launch destroy on " + child);
 		    	//#end
 				child.destroy();
-				removeChildAt(i);							
+				removeChildAt(i);
 			} while (i > 0);
 		}
 	}
@@ -121,14 +120,14 @@ class Screen extends Sprite implements IDestroyable
 		// leave margins
 		var maxWidth = screenWidth;// * 1.05;
 		var maxHeight = screenHeight;// * 1.05;
-		
+
 		currentScale = 1;
 		scaleX = 1;
 		scaleY = 1;
-		
+
 		var currentWidth = rwidth; //use width foau
 		var currentHeight = rheight;
-		
+
 		//if (currentWidth > maxWidth || currentHeight > maxHeight) {
 			var maxScaleX = maxWidth / currentWidth;
 			var maxScaleY = maxHeight / currentHeight;
@@ -160,7 +159,7 @@ class Screen extends Sprite implements IDestroyable
 			scaleX = currentScale;
 			scaleY = currentScale;
 		//}
-		
+
 		x = screenWidth / 2 - (currentWidth * currentScale) / 2;
 		y = screenHeight / 2 - (currentHeight * currentScale) / 2;
 	}
