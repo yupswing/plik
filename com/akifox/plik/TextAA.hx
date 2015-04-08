@@ -58,10 +58,11 @@ class TextAA extends Bitmap
 	 	} else {
 	 	    textFieldBitmapData = new BitmapData(nw, nh, true, 0x000000);
 	 	}
-    	textFieldBitmapData.draw(textField);
 
-    	bitmapData = textFieldBitmapData;
-	    if (_transformation != null) _transformation.updateSize(nw,nh);
+  	textFieldBitmapData.draw(textField);
+
+  	bitmapData = textFieldBitmapData;
+    if (_transformation != null) _transformation.updateSize(nw,nh);
 	}
 
   public function setText(value:String) {

@@ -18,37 +18,42 @@ class AtlasRegion
 	public var rect(get, never):Rectangle;
 	private inline function get_rect():Rectangle { return _rect; }
 	/**
+	 * Rect of this region
+	 */
+	public var frame(get, never):Rectangle;
+	private inline function get_frame():Rectangle { return _frame; }
+	/**
 	 * Width of this region
 	 */
 	public var width(get, never):Float;
-	private inline function get_width():Float { return _rect.width+_offset.x; }
+	private inline function get_width():Float { return _rect.width+_frame.x; }
 	/**
 	 * Height of this region
 	 */
 	public var height(get, never):Float;
-	private inline function get_height():Float { return _rect.height+_offset.y; }
+	private inline function get_height():Float { return _rect.height+_frame.y; }
 	/**
-	 * Offset x of this region
+	 * frame x of this region
 	 */
-	public var offsetX(get, never):Float;
-	private inline function get_offsetX():Float { return _offset.x; }
+	public var frameX(get, never):Float;
+	private inline function get_frameX():Float { return _frame.x; }
 	/**
-	 * Offset y of this region
+	 * frame y of this region
 	 */
-	public var offsetY(get, never):Float;
-	private inline function get_offsetY():Float { return _offset.y; }
+	public var frameY(get, never):Float;
+	private inline function get_frameY():Float { return _frame.y; }
 
 	/**
 	 * Creates a new AtlasRegion
 	 * @param  parent    The AtlasData parent to use for rendering
 	 * @param  rect      Rectangle to set for width/height
 	 */
-	public function new(parent:AtlasData, rect:Rectangle, ?offset:Point=null)
+	public function new(parent:AtlasData, rect:Rectangle, ?frame:Rectangle=null)
 	{
-		if (offset==null) offset = new Point(0,0);
+		if (frame==null) frame = rect;
 		this._parent = parent;
 		this._rect = rect;
-		this._offset = offset;
+		this._frame = frame;
 		this.rotated = false;
 	}
 
@@ -61,7 +66,7 @@ class AtlasRegion
 	public function clip(clipRect:Rectangle, ?center:Point):AtlasRegion
 	{
 		// make a copy of clipRect, to avoid modifying the original
-		var clipRectCopy = new Rectangle( clipRect.x, clipRect.y, clipRect.width, clipRect.height );
+		var clipRectCopy = clipRect.clone();
 
 		// only clip within the current region
 		if (clipRectCopy.x + clipRectCopy.width > _rect.width)
@@ -76,11 +81,11 @@ class AtlasRegion
 		// position clip rect where the last image was
 		clipRectCopy.x += _rect.x;
 		clipRectCopy.y += _rect.y;
-		return _parent.createRegion(clipRectCopy, center);
+		return _parent.createRegion(clipRectCopy, new Rectangle(center.x,center.y,clipRectCopy.width,clipRectCopy.height));
 	}
 
 	public function drawNow(graphics:Graphics,?x:Float=0,?y:Float=0,?alpha:Float=1) {
-		_parent.drawNow(graphics,x,y,_rect,_offset,alpha);
+		_parent.drawNow(graphics,x,y,_rect,new Point(_frame.x,_frame.y),alpha);
 	}
 
 	/**
@@ -103,7 +108,7 @@ class AtlasRegion
 		if (smooth == null) smooth = Atlas.smooth;
 		if (rotated) angle = angle + 90;
 
-		_parent.prepareTile(_rect, x+_offset.x*scaleX, y+_offset.y*scaleY, layer, scaleX, scaleY, angle, red, green, blue, alpha, smooth);
+		_parent.prepareTile(_rect, x+_frame.x*scaleX, y+_frame.y*scaleY, layer, scaleX, scaleY, angle, red, green, blue, alpha, smooth);
 	}
 
 	/**
@@ -155,10 +160,20 @@ class AtlasRegion
 	 */
 	public function toString():String
 	{
-		return "[AtlasRegion" + _rect + ", " + _offset + "]";
+		return "[AtlasRegion" + _rect + ", " + _frame + "]";
+	}
+
+	public function toBitmapData():openfl.display.BitmapData
+	{
+		var shape = new openfl.display.Shape();
+		drawNow(shape.graphics);
+		var bitmapdata = new openfl.display.BitmapData(Std.int(_frame.width),Std.int(_frame.height),true,0);
+		bitmapdata.draw(shape);
+		shape = null;
+		return bitmapdata;
 	}
 
 	private var _rect:Rectangle;
-	private var _offset:Point;
+	private var _frame:Rectangle;
 	private var _parent:AtlasData;
 }

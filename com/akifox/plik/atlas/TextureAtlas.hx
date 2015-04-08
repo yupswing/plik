@@ -35,6 +35,7 @@ class TextureAtlas extends Atlas
 			if (sprite.exists("frame_x")) PLIK.point.x = Std.parseInt(sprite.get("frame_x"));
 			if (sprite.exists("frame_y")) PLIK.point.y = Std.parseInt(sprite.get("frame_y"));
 
+			//rect
 			PLIK.rect.x = Std.parseInt(sprite.get("x"));
 			PLIK.rect.y = Std.parseInt(sprite.get("y"));
 			if (sprite.exists("w")) PLIK.rect.width = Std.parseInt(sprite.get("w"));
@@ -42,12 +43,24 @@ class TextureAtlas extends Atlas
 			if (sprite.exists("h")) PLIK.rect.height = Std.parseInt(sprite.get("h"));
 			else if (sprite.exists("height")) PLIK.rect.height = Std.parseInt(sprite.get("height"));
 
+			// frame
+			PLIK.rect2.x = 0;
+			PLIK.rect2.y = 0;
+			PLIK.rect2.width = PLIK.rect.width;
+			PLIK.rect2.height = PLIK.rect.width;
+			if (sprite.exists("frame_x")) PLIK.rect2.x = Std.parseInt(sprite.get("frame_x"));
+			if (sprite.exists("frame_y")) PLIK.rect2.y = Std.parseInt(sprite.get("frame_y"));
+			if (sprite.exists("frame_width")) PLIK.rect2.width = Std.parseInt(sprite.get("frame_width"));
+			if (sprite.exists("frame_height")) PLIK.rect2.height = Std.parseInt(sprite.get("frame_height"));
+
+			trace(PLIK.rect,PLIK.rect2);
+
 			// set the defined region
 			var name = if (sprite.exists("n")) sprite.get("n")
 						else if (sprite.exists("name")) sprite.get("name")
 						else throw("Unable to find the region's name.");
 
-			var region = atlas.defineRegion(name, PLIK.rect, PLIK.point);
+			var region = atlas.defineRegion(name, PLIK.rect, PLIK.rect2);
 
 			if (sprite.exists("r") && sprite.get("r") == "y") region.rotated = true;
 		}
@@ -64,7 +77,7 @@ class TextureAtlas extends Atlas
 	{
 		if (_regions.exists(name))
 			return _regions.get(name);
-			
+
 		throw 'Region has not been defined yet "$name".';
 	}
 
@@ -76,9 +89,9 @@ class TextureAtlas extends Atlas
 	 *
 	 * @return	The new AtlasRegion object.
 	 */
-	public function defineRegion(name:String, rect:Rectangle, ?offset:Point):AtlasRegion
+	public function defineRegion(name:String, rect:Rectangle, ?frame:Rectangle):AtlasRegion
 	{
-		var region = _data.createRegion(rect, offset);
+		var region = _data.createRegion(rect, frame);
 		_regions.set(name, region);
 		return region;
 	}

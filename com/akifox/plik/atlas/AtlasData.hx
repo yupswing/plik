@@ -10,7 +10,7 @@ import openfl.display.Tilesheet;
 
 /**
  * Abstract representing either a `String`, a `AtlasData` or a `BitmapData`.
- * 
+ *
  * Conversion is automatic, no need to use this.
  */
 abstract AtlasDataType(AtlasData)
@@ -48,9 +48,9 @@ class AtlasData
 
 	/**
 	 * Creates a new AtlasData class
-	 * 
+	 *
 	 * **NOTE**: Only create one instace of AtlasData per name. An error will be thrown if you try to create a duplicate.
-	 * 
+	 *
 	 * @param bd     BitmapData image to use for rendering
 	 * @param name   A reference to the image data, used with destroy and for setting rendering flags
 	 */
@@ -178,9 +178,9 @@ class AtlasData
 	 *
 	 * @return The new AtlasRegion object.
 	 */
-	public inline function createRegion(rect:Rectangle, ?offset:Point=null):AtlasRegion
+	public inline function createRegion(rect:Rectangle, ?frame:Rectangle=null):AtlasRegion
 	{
-		return new AtlasRegion(this, rect.clone(), (offset==null?null:offset.clone()));
+		return new AtlasRegion(this, rect.clone(), (frame==null?null:frame.clone()));
 	}
 
 	/**
@@ -208,7 +208,6 @@ class AtlasData
 	public function drawNowBatch(graphics:Graphics, data:Array<Float>, smoothing:Bool, renderFlags:Int, dataIndex:Int) {
 		_tilesheet.drawTiles(graphics, data, smoothing, renderFlags, dataIndex);
 	}
-
 
 	/**
 	 * Prepares a tile to be drawn using a matrix
