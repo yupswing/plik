@@ -53,8 +53,6 @@ class TextureAtlas extends Atlas
 			if (sprite.exists("frame_width")) PLIK.rect2.width = Std.parseInt(sprite.get("frame_width"));
 			if (sprite.exists("frame_height")) PLIK.rect2.height = Std.parseInt(sprite.get("frame_height"));
 
-			trace(PLIK.rect,PLIK.rect2);
-
 			// set the defined region
 			var name = if (sprite.exists("n")) sprite.get("n")
 						else if (sprite.exists("name")) sprite.get("name")

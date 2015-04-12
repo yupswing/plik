@@ -37,18 +37,18 @@ class Text extends TextField
 	}
 
   public function setText(value:String) {
-      textField.text = value;
-      redraw();
+    textField.text = value;
+    redraw();
     return value;
   }
 
 	public function setColor(value:Int) {
-        textFieldFormat.color = value;
-        textField.defaultTextFormat = textFieldFormat;
-        textField.setTextFormat(textFieldFormat);
-        redraw();
-        return value;
-    }
+    textFieldFormat.color = value;
+    textField.defaultTextFormat = textFieldFormat;
+    textField.setTextFormat(textFieldFormat);
+    redraw();
+    return value;
+	}
 
 	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if !v2 TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 
@@ -66,15 +66,16 @@ class Text extends TextField
 		//prepare the TextFormat
     textFieldFormat = new TextFormat(textFieldFont.fontName, textFieldSize , textFieldColor);
 
-    textFieldFormat.align = align;
+    //textFieldFormat.align = align;
     textField.autoSize = TextFieldAutoSize.LEFT;
-    textField.antiAliasType = AntiAliasType.ADVANCED;
+    //textField.antiAliasType = AntiAliasType.ADVANCED;
     textField.defaultTextFormat = textFieldFormat;
+		textField.setTextFormat(textFieldFormat);
     textField.embedFonts = true;
     textField.selectable = false;
     textField.wordWrap = false;
     textField.border = false;
-		text = stringText;
+		textField.text = stringText;
 
     _transformation = new Transformation(this.transform.matrix,this.width,this.height);
     _transformation.bind(this);

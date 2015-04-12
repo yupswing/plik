@@ -102,6 +102,7 @@ class TextAA extends Bitmap
     textField.autoSize = TextFieldAutoSize.LEFT;
     textField.antiAliasType = AntiAliasType.ADVANCED;
     textField.defaultTextFormat = textFieldFormat;
+		textField.setTextFormat(textFieldFormat);
     textField.embedFonts = true;
     textField.selectable = false;
     textField.wordWrap = false;
