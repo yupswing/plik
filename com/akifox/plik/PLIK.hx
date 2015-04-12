@@ -211,7 +211,7 @@ class PLIK
 	//##########################################################################################
 
   public static function initStyle(styleSet:String) {
-    com.akifox.plik.gui.Style.loadStyle(styleSet);
+    com.akifox.plik.gui.Style.loadStyleSet(styleSet);
   }
 
 

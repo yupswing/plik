@@ -6,22 +6,51 @@ class Style {
 
     private static var _styleSet:Dynamic = {};
 
-    public static function loadStyle(style:String) {
+    public static function loadStyleSet(styleString:String) {
       try {
-        _styleSet = haxe.Json.parse(style);
+        _styleSet = haxe.Json.parse(styleString);
       } catch(e:Dynamic) {
-        trace('error loading style $e');
+        trace('Error: unable to load style [$e]');
       }
     }
 
-    public static function getStyle(stylePattern:String):Style {
-      var styles = stylePattern.split('.');
+    public static function mergeStyleSet(styleString:String) {
+      var newStyleSet:Dynamic = {};
+      try {
+        newStyleSet = haxe.Json.parse(styleString);
+      } catch(e:Dynamic) {
+       trace('Error: unable to merge style [$e]');
+      }
+
+      // MERGE ANONYMOUS STRUCTURE (preserve old values not reset by the newStyleSet)
+      for (rule in Reflect.fields(newStyleSet)) {
+        if (!Reflect.hasField(_styleSet,rule)) Reflect.setProperty(_styleSet,rule,{});
+        for (prop in Reflect.fields(Reflect.getProperty(newStyleSet,rule))) {
+          var value = Reflect.getProperty(Reflect.getProperty(newStyleSet,rule),prop);
+          Reflect.setProperty(Reflect.getProperty(_styleSet,rule),prop,value);
+          trace(prop,value);
+        }
+      }
+      // PRINT STYLE
+      #if stylecheck
+      for (rule in Reflect.fields(_styleSet)) {
+        trace('"$rule"');
+        for (prop in Reflect.fields(Reflect.getProperty(_styleSet,rule))) {
+          var value = Reflect.getProperty(Reflect.getProperty(_styleSet,rule),prop);
+          trace('\t"$prop" : $value');
+        }
+      }
+      #end
+    }
+
+    public static function getStyle(styleRuleMatch:String):Style {
+      var styleRules = styleRuleMatch.split('.');
       var style:Style = new Style();
-      for (el in styles) {
-        if (Reflect.hasField(_styleSet,el)) {
-          style.set(Reflect.getProperty(_styleSet,el));
+      for (rule in styleRules) {
+        if (Reflect.hasField(_styleSet,rule)) {
+          style.set(Reflect.getProperty(_styleSet,rule));
         } else {
-          trace('no style "$el"');
+          trace('Warning: no rule "$rule"');
         }
       }
       return style;
