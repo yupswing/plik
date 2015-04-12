@@ -11,6 +11,10 @@ interface IStyle {
   public function getGrossWidth():Float;
   public function getGrossHeight():Float;
 
+  #if flash
+  public var graphics(default,never):flash.display.Graphics;
+  #else
   public var graphics(get,null):openfl.display.Graphics;
+  #end
 
 }

@@ -79,11 +79,11 @@ class TextAA extends Bitmap
       return value;
   }
 
-	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if !v2 TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
+	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if (!v2 || flash) TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 
 		super ();
 
-    if (align==null) align = TextFormatAlign.LEFT;
+    if (align==null) align = :#if (!v2 || flash) TextFormatAlign.LEFT #else "left" #end;
 
     textFieldSize = size;
     textFieldColor = color;

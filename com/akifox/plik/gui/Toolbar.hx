@@ -24,6 +24,8 @@ class Toolbar extends SpriteContainer implements IStyle
   var _selected:Button = null;
   var _selectable:Bool = false;
 
+  //*****************************************************************
+
   var _styleButton:Style;
   public var styleButton(get,set):Style;
   private function get_styleButton():Style { return _styleButton; }
@@ -42,6 +44,8 @@ class Toolbar extends SpriteContainer implements IStyle
     return value;
   }
 
+  //*****************************************************************
+
 	public function new (buttonsPerRow:Int, selectable:Bool, style:Style, styleButton:Style) {
 		super();
     if (buttonsPerRow<=0) buttonsPerRow = 256; // 1 row only
@@ -57,6 +61,8 @@ class Toolbar extends SpriteContainer implements IStyle
     Style.drawBackground(this,_style);
   }
 
+  //*****************************************************************
+
   public function getRows():Int {
     return Math.ceil(_buttons.length/_buttonsPerRow);
   }
@@ -64,6 +70,8 @@ class Toolbar extends SpriteContainer implements IStyle
   public function getColumns():Int {
     return Std.int(Math.min(_buttonsPerRow,_buttons.length));
   }
+
+  //*****************************************************************
 
   public function getNetWidth():Float {
     return getColumns()*(_buttonsWidth+_style.offset)-_style.offset;
@@ -81,13 +89,41 @@ class Toolbar extends SpriteContainer implements IStyle
     return getNetHeight()+_style.padding*2;//+_style.outline_size/2;
   }
 
+  //*****************************************************************
+
   public function getSelected():Button {
     return _selected;
   }
 
+  //*****************************************************************
+
   public function getButtonByIndex(index:Int):Button {
     if (index>=_buttons.length || index<0) return null;
     return _buttons[index];
+  }
+
+  public function getButtonById(id:String):Button {
+    for (button in _buttons) {
+      if (button.id == id) return button;
+    }
+    return null;
+  }
+
+  public function getButtonByValue(value:Dynamic):Button {
+    for (button in _buttons) {
+      if (button.value == value) return button;
+    }
+    return null;
+  }
+
+  //*****************************************************************
+
+  public function select(button:Button):Bool {
+    if (button==null || !button.selectable) return false;
+    if (_selected != null) _selected.isSelected = false;
+    _selected = button;
+    button.isSelected = true;
+    return true;
   }
 
   public function selectByIndex(index:Int):Button {
@@ -97,13 +133,7 @@ class Toolbar extends SpriteContainer implements IStyle
     return button;
   }
 
-  private function select(button:Button):Bool {
-    if (button==null || !button.selectable) return false;
-    if (_selected != null) _selected.isSelected = false;
-    _selected = button;
-    button.isSelected = true;
-    return true;
-  }
+  //*****************************************************************
 
   public function addButton(id:String,value:Dynamic=null,icon:BitmapData=null,?actionF:Button->Void=null,?actionAltF:Button->Void=null) {
     var button:Button=null;
