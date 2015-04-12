@@ -1,0 +1,13 @@
+{
+  "name": "plik",
+  "url" : "https://github.com/yupswing/plik",
+  "license": "MIT",
+  "tags": ["cross","flash","cpp","neko","java","js","gui","engine","library","openfl"],
+  "description": "Haxe+OpenFL application/game library",
+  "version": "0.5.0",
+  "releasenote": "",
+  "contributors": ["yupswing"],
+  "dependencies": {"openfl":"",
+                   "actuate":"",
+                   "hxColorToolkit":""}
+}

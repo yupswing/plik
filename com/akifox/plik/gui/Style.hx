@@ -10,7 +10,7 @@ class Style {
       try {
         _styleSet = haxe.Json.parse(style);
       } catch(e:Dynamic) {
-        trace('error loading style');
+        trace('error loading style $e');
       }
     }
 
