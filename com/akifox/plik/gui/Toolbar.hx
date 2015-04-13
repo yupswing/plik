@@ -135,9 +135,10 @@ class Toolbar extends SpriteContainer implements IStyle
 
   //*****************************************************************
 
-  public function addButton(id:String,value:Dynamic=null,icon:BitmapData=null,?actionF:Button->Void=null,?actionAltF:Button->Void=null) {
+  public function addButton(id:String,value:Dynamic=null,selectable:Bool=false,icons:Array<BitmapData>=null,?actionF:Button->Void=null,?actionAltF:Button->Void=null) {
     var button:Button=null;
-    if (icon!=null) {
+    if (_selectable) selectable = true; //every button in a selectable toolbar is selectable
+    if (icons!=null) {
       button = new Button();
       button.id = id;
       button.value = value;
@@ -148,13 +149,15 @@ class Toolbar extends SpriteContainer implements IStyle
                           if (actionF!=null) actionF(button); //fire action
                        };
       if (actionAltF!=null) button.actionAltF = actionAltF;
-      button.icon = icon;
+      button.icon = icons[0];
+      if (icons.length>1 && icons[1]!=null) button.iconOver = icons[1];
       if (_buttons.length==0) {
         //set width & height same as first button
         _buttonsWidth = Std.int(button.getGrossWidth());
         _buttonsHeight = Std.int(button.getGrossHeight());
       }
-      if (_selectable) {
+      if (_selectable || selectable) {
+        if (icons.length>2 && icons[2]!=null) button.iconSelected = icons[2];
         button.selectable = true;
         if (_selectable && (_buttons.length==0)) {
           select(button);
