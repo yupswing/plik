@@ -94,6 +94,11 @@ class Scroll extends Box {
       draw();
   	}
 
+    public function updateHeight(height) {
+      _height = height;
+      draw();
+    }
+
     public override function destroy() {
       super.destroy();
     }
