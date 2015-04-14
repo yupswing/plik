@@ -40,11 +40,11 @@ class Box extends SpriteContainer implements IStyle {
     }
 
     public function getNetWidth():Float {
-      return this.width;
+      return Math.max(this.width,style.minWidth);
     }
 
     public function getNetHeight():Float {
-      return this.height;
+      return Math.max(this.height,style.minHeight);
     }
 
     public function getGrossWidth():Float {
@@ -55,9 +55,10 @@ class Box extends SpriteContainer implements IStyle {
       return getNetHeight()+_style.padding*2;//+_style.outline_size/2;
     }
 
-
     public function draw(?width:Float=0,?height:Float=0,?isSelected:Bool=false) {
 		  graphics.clear();
+      if (width<0) width = getGrossWidth();
+      if (height<0) height = getGrossWidth();
       Style.drawBackground(this,_style,isSelected,false,width,height);
     }
 

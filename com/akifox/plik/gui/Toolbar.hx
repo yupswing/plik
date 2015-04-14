@@ -104,6 +104,7 @@ class Toolbar extends SpriteContainer implements IStyle
 
   public function getButtonById(id:String):Button {
     for (button in _buttons) {
+      if (button == null) continue;
       if (button.id == id) return button;
     }
     return null;
@@ -111,6 +112,7 @@ class Toolbar extends SpriteContainer implements IStyle
 
   public function getButtonByValue(value:Dynamic):Button {
     for (button in _buttons) {
+      if (button == null) continue;
       if (button.value == value) return button;
     }
     return null;
@@ -133,11 +135,18 @@ class Toolbar extends SpriteContainer implements IStyle
     return button;
   }
 
+  public function selectById(id:String):Button {
+    var button = getButtonById(id);
+    if (button==null) return null;
+    select(button);
+    return button;
+  }
+
   //*****************************************************************
 
   public function addButton(id:String,value:Dynamic=null,selectable:Bool=false,icons:Array<BitmapData>=null,?actionF:Button->Void=null,?actionAltF:Button->Void=null) {
     var button:Button=null;
-    if (_selectable) selectable = true; //every button in a selectable toolbar is selectable
+    //if (_selectable) selectable = true; //every button in a selectable toolbar is selectable
     if (icons!=null) {
       button = new Button();
       button.id = id;
@@ -158,7 +167,7 @@ class Toolbar extends SpriteContainer implements IStyle
       }
       if (_selectable || selectable) {
         if (icons.length>2 && icons[2]!=null) button.iconSelected = icons[2];
-        button.selectable = true;
+        button.selectable = selectable;
         if (_selectable && (_buttons.length==0)) {
           select(button);
         }

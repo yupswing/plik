@@ -66,9 +66,9 @@ class Text extends TextField
 		//prepare the TextFormat
     textFieldFormat = new TextFormat(textFieldFont.fontName, textFieldSize , textFieldColor);
 
-    //textFieldFormat.align = align;
+    textFieldFormat.align = align;
     textField.autoSize = TextFieldAutoSize.LEFT;
-    //textField.antiAliasType = AntiAliasType.ADVANCED;
+    textField.antiAliasType = AntiAliasType.ADVANCED;
     textField.defaultTextFormat = textFieldFormat;
 		textField.setTextFormat(textFieldFormat);
     textField.embedFonts = true;
