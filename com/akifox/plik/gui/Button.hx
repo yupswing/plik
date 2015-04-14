@@ -64,15 +64,16 @@ class Button extends SpriteContainer implements IStyle {
     public var text(get,set):Text;
     private function get_text():Text {return _text;}
     private function set_text(value:Text):Text {
-      if (value==null && _text!=null) removeChild(_text);
-      if (value!=null && _text==null) addChild(value);
+      if (_text!=null) removeChild(_text);
+      if (value!=null) addChild(value);
       _text = value;
       this.draw();
       return value;
     }
 
-    public function makeText(string:String) {
+    public function makeText(string:String):String {
       set_text(new Text(string,_style.font_size,_style.color,openfl.text.TextFormatAlign.CENTER,_style.font_name));
+      return string;
     }
 
     //*****************************************************************

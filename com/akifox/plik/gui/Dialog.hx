@@ -8,7 +8,7 @@ class Dialog extends Box
     private var _height:Float = 0;
 
     var _value:Dynamic;
-    public var value(get,null):Dynamic;
+    public var value(get,set):Dynamic;
     private function get_value():Dynamic {return _value;}
     private function set_value(value:Dynamic):Dynamic {
       return _value = value;
@@ -16,22 +16,22 @@ class Dialog extends Box
 
     var _callback:Dialog->Void;
 
-    public function getNetWidth():Float {
+    public override function getNetWidth():Float {
       return _width;
     }
 
-    public function getNetHeight():Float {
+    public override function getNetHeight():Float {
       return _height;
     }
 
-    public function redraw(?newWidth:Float=0,?newHeight:Float=0) {
+    public function drawDialog(?newWidth:Float=0,?newHeight:Float=0) {
       if (newWidth>0) _width = newWidth;
       if (newHeight>0) _height = newHeight;
       draw(_width,_height);
     }
 
   	public function new (style:Style,?startValue:Dynamic=null,?callback:Dialog->Void=null) {
-      _style = style;
+      super(style);
       _value = startValue;
       _callback = callback;
     }

@@ -71,6 +71,30 @@ class TextAA extends Bitmap
     return value;
   }
 
+	public function setSize(value:Int) {
+      textFieldFormat.size = value;
+      textField.defaultTextFormat = textFieldFormat;
+      textField.setTextFormat(textFieldFormat);
+      redraw();
+      return value;
+  }
+
+	public function setFont(value:String) {
+      textFieldFormat.font = value;
+      textField.defaultTextFormat = textFieldFormat;
+      textField.setTextFormat(textFieldFormat);
+      redraw();
+      return value;
+  }
+
+	public function setAlign(value:#if (!v2 || flash) TextFormatAlign #else String = null #end) {
+      textFieldFormat.align = value;
+      textField.defaultTextFormat = textFieldFormat;
+      textField.setTextFormat(textFieldFormat);
+      redraw();
+      return value;
+  }
+
 	public function setColor(value:Int) {
       textFieldFormat.color = value;
       textField.defaultTextFormat = textFieldFormat;
