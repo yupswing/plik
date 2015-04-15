@@ -137,8 +137,10 @@ class Text extends TextField
 	  #end
 
 		// destroy this element
-		this._transformation.destroy();
-		this._transformation = null;
+		if (this._transformation!=null) {
+			this._transformation.destroy();
+			this._transformation = null;
+		}
 	}
 
 }

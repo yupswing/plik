@@ -40,6 +40,11 @@ class DialogMessage extends Dialog
       addChild(_box);
     }
 
+    public override function destroy() {
+      _box.destroy();
+      super.destroy();
+    }
+
     var _showCancelButton:Bool=true;
     public var showCancelButton(never,set):Bool;
     private function set_showCancelButton(value:Bool):Bool {
