@@ -103,6 +103,15 @@ class TextAA extends Bitmap
       return value;
   }
 
+	public function setSelectable(value:Bool) {
+      return false;
+  }
+
+	public function setWordWrap(value:Bool) {
+      textField.wordWrap = value;
+      return value;
+  }
+
 	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if (!v2 || flash) TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 
 		super ();

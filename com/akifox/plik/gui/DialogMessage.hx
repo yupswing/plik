@@ -2,7 +2,7 @@ package com.akifox.plik.gui;
 import com.akifox.plik.*;
 
 
-class DialogConfirm extends Dialog
+class DialogMessage extends Dialog
 {
     var _box:Box;
     var _buttonOk:Button;
@@ -35,41 +35,72 @@ class DialogConfirm extends Dialog
       _box.addChild(_buttonCancel);
       _box.addChild(_text);
 
-      // positions and first draw
-      var boxWidth = getBoxWidth();
-      var boxHeight = getBoxHeight();
-      _text.x = boxStyle.padding + boxWidth/2-_text.width/2;
-      _text.y = boxStyle.padding;
-      _buttonCancel.y = _text.y+_text.height+boxStyle.offset;
-      _buttonOk.y = _text.y+_text.height+boxStyle.offset;
-      updateButtonsPosition();
+      updatePosition();
 
       addChild(_box);
     }
 
-    private function updateButtonsPosition() {
+    var _showCancelButton:Bool=true;
+    public var showCancelButton(never,set):Bool;
+    private function set_showCancelButton(value:Bool):Bool {
+      if (value==_showCancelButton) return value;
+      if (value) {
+        _box.addChild(_buttonCancel);
+      } else {
+        _box.removeChild(_buttonCancel);
+      }
+      _showCancelButton = value;
+      updatePosition();
+      return value;
+    }
+
+    public var selectable(never,set):Bool;
+    private function set_selectable(value:Bool):Bool {
+      return _text.setSelectable(value);
+    }
+
+    public function setWrap(wrap:Bool,maxWidth:Int=350) {
+      _text.setWordWrap(wrap);
+      _text.width = maxWidth;
+      updatePosition();
+    }
+
+    private function updatePosition() {
       var boxWidth = getBoxWidth();
       var boxHeight = getBoxHeight();
-      _buttonCancel.x = boxWidth/2+_boxStyle.padding-_buttonCancel.getGrossWidth()-_boxStyle.offset/2;
-      _buttonOk.x = boxWidth/2+_boxStyle.padding+_boxStyle.offset/2;
+      _text.x = _boxStyle.padding + boxWidth/2-_text.width/2;
+      _text.y = _boxStyle.padding;
+      if (_showCancelButton) {
+        _buttonCancel.y = _text.y+_text.height+_boxStyle.offset;
+        _buttonOk.y = _text.y+_text.height+_boxStyle.offset;
+        _buttonCancel.x = boxWidth/2+_boxStyle.padding-_buttonCancel.getGrossWidth()-_boxStyle.offset/2;
+        _buttonOk.x = boxWidth/2+_boxStyle.padding+_boxStyle.offset/2;
+      } else {
+        _buttonOk.y = _text.y+_text.height+_boxStyle.offset;
+        _buttonOk.x = boxWidth/2-_buttonOk.getGrossWidth()/2+_boxStyle.padding;
+      }
     }
 
     public var textOk(never,set):String;
     private function set_textOk(value:String):String {
       _buttonOk.makeText(value);
-      updateButtonsPosition();
+      updatePosition();
       return value;
     }
 
     public var textCancel(never,set):String;
     private function set_textCancel(value:String):String {
       _buttonCancel.makeText(value);
-      updateButtonsPosition();
+      updatePosition();
       return value;
     }
 
     private function getBoxWidth():Float{
-      return Math.max(Math.max(_text.width,_buttonOk.getGrossWidth()+_boxStyle.offset+_buttonCancel.getGrossWidth()),_boxStyle.minWidth);
+      if (_showCancelButton) {
+        return Math.max(Math.max(_text.width,_buttonOk.getGrossWidth()+_boxStyle.offset+_buttonCancel.getGrossWidth()),_boxStyle.minWidth);
+      } else {
+        return Math.max(Math.max(_text.width,_buttonOk.getGrossWidth()),_boxStyle.minWidth);
+      }
     }
 
     private function getBoxHeight():Float{

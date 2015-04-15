@@ -74,6 +74,17 @@ class Text extends TextField
       return value;
   }
 
+	public function setSelectable(value:Bool) {
+      textField.selectable = value;
+      return value;
+  }
+
+	public function setWordWrap(value:Bool) {
+      textField.wordWrap = value;
+      return value;
+  }
+
+
 	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if (!v2 || flash) TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 
 		super ();
@@ -84,7 +95,6 @@ class Text extends TextField
     textFieldColor = color;
     if (font=="") font = _defaultFont;
     textFieldFont = PLIK.getFont(font);
-		trace(textFieldFont.fontName);
 
 		textField = this;
 
