@@ -9,5 +9,6 @@
   "contributors": ["yupswing"],
   "dependencies": {"openfl":"",
                    "actuate":"",
-                   "hxColorToolkit":""}
+                   "hxColorToolkit":"",
+                   "systools":""}
 }

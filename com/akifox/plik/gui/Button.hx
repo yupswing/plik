@@ -208,6 +208,8 @@ class Button extends SpriteContainer implements IStyle {
     }
 
     public override function destroy() {
+      _actionF = null;
+      _actionAltF = null;
       _lastIconBitmap = null;
       icon = null; // destroy
       iconSelected = null; // destroy

@@ -107,10 +107,18 @@ class TextAA extends Bitmap
       return false;
   }
 
+	public function setInput(value:Bool) {
+      return false;
+  }
+
 	public function setWordWrap(value:Bool) {
       textField.wordWrap = value;
       return value;
   }
+
+	public function setFocus() {
+			//impossible it is a Bitmap!
+	}
 
 	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if (!v2 || flash) TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 
@@ -167,11 +175,11 @@ class TextAA extends Bitmap
     #end
 
 		// destroy this element
-		this._transformation.destroy();
+		if (this._transformation!=null) this._transformation.destroy();
 		this._transformation = null;
 
 		bitmapData = null;
-	 	textFieldBitmapData.dispose();
+		if (textFieldBitmapData!=null) textFieldBitmapData.dispose();
 	 	textFieldBitmapData = null;
   }
 

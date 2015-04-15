@@ -10,6 +10,7 @@ import openfl.text.AntiAliasType;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import com.akifox.transform.Transformation;
+import openfl.Lib;
 
 class Text extends TextField
 {
@@ -84,6 +85,22 @@ class Text extends TextField
       return value;
   }
 
+	public function setInput(value:Bool) {
+			if (value) {
+				textField.type = openfl.text.TextFieldType.INPUT;
+			} else {
+				textField.type = openfl.text.TextFieldType.DYNAMIC;
+			}
+      return value;
+  }
+
+	public function setFocus() {
+		try {
+			Lib.current.stage.focus = textField;
+		} catch(e:Dynamic) {
+			trace('unable to set focus to Text');
+		}
+	}
 
 	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if (!v2 || flash) TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 
@@ -137,10 +154,8 @@ class Text extends TextField
 	  #end
 
 		// destroy this element
-		if (this._transformation!=null) {
-			this._transformation.destroy();
+		if (this._transformation!=null) this._transformation.destroy();
 			this._transformation = null;
-		}
 	}
 
 }

@@ -36,18 +36,18 @@ class SpriteContainer extends Sprite implements IDestroyable {
     public function get_dead():Bool { return _dead; }
 
 	public function destroy() {
-        #if gbcheck
-        trace('GB Destroy > ' + this);
-        #end
-        _dead = true;    	
+      #if gbcheck
+      trace('GB Destroy > ' + this);
+      #end
+      _dead = true;
 
-        if (numChildren != 0) {
-			var i:Int = numChildren;	
+      if (numChildren != 0) {
+			var i:Int = numChildren;
 			var child:Dynamic;
 			do {
 				i--;
 				child = getChildAt(i);
-				removeChildAt(i);						
+				removeChildAt(i);
 			} while (i > 0);
 		}
 	}
