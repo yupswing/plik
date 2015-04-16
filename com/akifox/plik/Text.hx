@@ -102,6 +102,11 @@ class Text extends TextField
 		}
 	}
 
+	public function setCaretEnd() {
+		if (textField.type == openfl.text.TextFieldType.DYNAMIC) return;
+		textField.setSelection(textField.text.length-1,textField.text.length-1);
+	}
+
 	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if (!v2 || flash) TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 
 		super ();

@@ -76,6 +76,7 @@ class DialogMessage extends Dialog
     }
 
     public function setFocus() {
+      _text.setCaretEnd();
       _text.supportPaste = true;
       _text.setFocus();
     }

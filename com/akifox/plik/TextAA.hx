@@ -120,6 +120,10 @@ class TextAA extends Bitmap
 			//impossible it is a Bitmap!
 	}
 
+	public function setCaretEnd() {
+			//impossible it is a Bitmap!
+	}
+
 	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if (!v2 || flash) TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 
 		super ();

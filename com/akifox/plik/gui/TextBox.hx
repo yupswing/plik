@@ -72,7 +72,7 @@ class TextBox extends Box
       }
       if (maxHeight>0) {
         _text.height = maxHeight;
-        if (_isInput) _height = maxWidth;
+        if (_isInput) _height = maxHeight;
       }
       updatePosition();
       super.draw();
@@ -81,6 +81,10 @@ class TextBox extends Box
     public function setFocus() {
       if (_isInput) _text.setFocus();
     }
+
+  	public function setCaretEnd() {
+      if (_isInput) _text.setCaretEnd();
+  	}
 
     private function updatePosition() {
       _text.x = _style.padding;//getNetWidth()/2-_text.width/2+_style.padding;
