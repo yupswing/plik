@@ -128,7 +128,7 @@ class TextAA extends Bitmap
 
 		super ();
 
-    if (align==null) align = :#if (!v2 || flash) TextFormatAlign.LEFT #else "left" #end;
+    if (align==null) align = #if (!v2 || flash) TextFormatAlign.LEFT #else "left" #end;
 
     textFieldSize = size;
     textFieldColor = color;
