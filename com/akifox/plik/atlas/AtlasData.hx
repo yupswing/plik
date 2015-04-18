@@ -2,7 +2,6 @@ package com.akifox.plik.atlas;
 
 import openfl.display.BitmapData;
 import openfl.display.Graphics;
-import openfl.display.Sprite;
 import openfl.geom.Rectangle;
 import openfl.geom.Point;
 import openfl.geom.Matrix;
@@ -130,10 +129,12 @@ class AtlasData
 	 * @param	scene	The scene object to set
 	 */
 	//@:allow(com.haxepunk.Scene)
-	private static inline function startScene(scene:Sprite):Void
+	public static var target(default, set):Graphics;
+	private static inline function set_target(target:Graphics):Graphics
 	{
-		_scene = scene;
-		_scene.graphics.clear();
+		_scene = target;
+		_scene.clear();
+		return target;
 	}
 
 	/**
@@ -190,13 +191,13 @@ class AtlasData
 	{
 		if (_dataIndex != 0)
 		{
-			_tilesheet.drawTiles(_scene.graphics, _data, false, _renderFlags, _dataIndex);
+			_tilesheet.drawTiles(_scene, _data, false, _renderFlags, _dataIndex);
 			_dataIndex = 0;
 		}
 
 		if (_smoothDataIndex != 0)
 		{
-			_tilesheet.drawTiles(_scene.graphics, _smoothData, true, _renderFlags, _smoothDataIndex);
+			_tilesheet.drawTiles(_scene, _smoothData, true, _renderFlags, _smoothDataIndex);
 			_smoothDataIndex = 0;
 		}
 	}
@@ -428,7 +429,7 @@ class AtlasData
 	private var _smoothData:Array<Float>;
 	private var _smoothDataIndex:Int;
 
-	private static var _scene:Sprite;
+	private static var _scene:Graphics;
 	private static var _dataPool:Map<String, AtlasData> = new Map<String, AtlasData>();
 	private static var _uniqueId:Int = 0; // allows for unique names
 }

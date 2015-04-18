@@ -84,4 +84,6 @@ class Atlas
 	// private static inline function get_count():Int { return _atlases.length; }
 
 	private var _data:AtlasData;
+	public var data(get,null):AtlasData;
+	private function get_data():AtlasData { return _data; }
 }

@@ -28,7 +28,7 @@ class Screen extends Sprite implements IDestroyable
 
 	public var title:String = "Screen";
 
-	private var resizePow:Bool = false;
+	public var resizePow:Bool = false;
 
 	private var cycle:Bool = false;
 

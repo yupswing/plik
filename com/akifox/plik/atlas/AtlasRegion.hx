@@ -101,7 +101,7 @@ class AtlasRegion
 	 * @param	blue	A blue tint value
 	 * @param	alpha	The tile's opacity
 	 */
-	public inline function draw(x:Float, y:Float, layer:Int,
+	public inline function draw(x:Float, y:Float, layer:Int=0,
 		scaleX:Float=1, scaleY:Float=1, angle:Float=0,
 		red:Float=1, green:Float=1, blue:Float=1, alpha:Float=1, ?smooth:Bool)
 	{
