@@ -792,7 +792,7 @@ class PLIK
 
 	public static function quit(){
 		onClose(null);
-		#if (v2 && !flash)
+		#if (v2 && !web)
 		Lib.exit();
 		#end
 	}

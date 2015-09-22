@@ -59,7 +59,7 @@ class Text extends TextField
       return value;
   }
 
-	public function setAlign(value:#if (!v2 || flash) TextFormatAlign #else String = null #end) {
+	public function setAlign(value:#if (!v2 || web) TextFormatAlign #else String = null #end) {
       textFieldFormat.align = value;
       textField.defaultTextFormat = textFieldFormat;
       textField.setTextFormat(textFieldFormat);
@@ -107,11 +107,11 @@ class Text extends TextField
 		textField.setSelection(textField.text.length-1,textField.text.length-1);
 	}
 
-	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if (!v2 || flash) TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
+	public function new (stringText:String="",?size:Int=20,?color:Int=0,?align:#if (!v2 || web) TextFormatAlign #else String = null #end,?font:String="",?smoothing:Bool=true) {
 
 		super ();
 
-    if (align==null) align = #if (!v2 || flash) TextFormatAlign.LEFT #else "left" #end;
+    if (align==null) align = #if (!v2 || web) TextFormatAlign.LEFT #else "left" #end;
 
     textFieldSize = size;
     textFieldColor = color;

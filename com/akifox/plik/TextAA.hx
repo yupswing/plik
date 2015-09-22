@@ -1,6 +1,6 @@
 package com.akifox.plik;
 
-#if (flash || (!v2 && !legacy))
+#if (web || (!v2 && !legacy))
 
 // this class it's a TextField
 // Flash renders the TextField beautifully and it doesn't need any trick
